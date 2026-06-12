@@ -9,8 +9,10 @@ export const CONFIG = {
   SUPABASE_URL: 'https://fpntzgrocuiiqjixtbuo.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwbnR6Z3JvY3VpaXFqaXh0YnVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNjYwMzUsImV4cCI6MjA5NDc0MjAzNX0.Pu3XlmjBRlp6XQ5dwiBIB_w_SdBUNMxZMJmqTUdEFo8',
 
-  // ── TomTom (source trafic UNIQUE — contrainte #4) ─────────
-  TOMTOM_API_KEY: 'oA1Sdaq2bXK3NZWBw9o3A1lXcyER8sl9', // quota gratuit 2 500 req/jour
+  // ── Trafic ────────────────────────────────────────────────
+  // TomTom retiré : aucune couverture trafic temps réel en Côte d'Ivoire.
+  // La couche « Mon trafic » est construite à partir des camions ; pour
+  // les bouchons en direct, le bouton « 🌐 Trafic réel » ouvre Google Maps.
 
   // ── Fond de carte ─────────────────────────────────────────
   // Si MAPTILER_KEY vide → fallback OpenFreeMap (100% gratuit, sans clé)
