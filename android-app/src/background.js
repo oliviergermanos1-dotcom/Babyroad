@@ -15,8 +15,11 @@ export async function startTracking(userId) {
   kalman.reset();
   watcherId = await BackgroundGeolocation.addWatcher(
     {
-      backgroundTitle: 'Babyroad — Tracking actif',
-      backgroundMessage: 'GPS en cours (toucher pour ouvrir)',
+      // Notification EXIGÉE par Android pour tout service GPS arrière-plan
+      // (la retirer = Android tue le tracking). Libellé réduit au minimum ;
+      // le chauffeur peut la passer en silencieux : appui long → Silencieux.
+      backgroundTitle: 'Babyroad',
+      backgroundMessage: 'Service actif',
       requestPermissions: true,
       // stale:false → ignore les positions périmées (anti-dérive batterie)
       stale: false,
