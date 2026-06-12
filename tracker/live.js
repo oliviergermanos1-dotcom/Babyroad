@@ -36,7 +36,7 @@ export function setupLive(sb, userId) {
   channel
     .on('broadcast', { event: 'signal' }, async ({ payload }) => {
       try {
-        if (payload.type === 'want-stream') await startStream();
+        if (payload.type === 'want-stream') await startStream(payload.video !== false);
         else if (payload.type === 'answer' && pc) await pc.setRemoteDescription(payload.sdp);
         else if (payload.type === 'ice-dispatcher' && pc) await pc.addIceCandidate(payload.candidate);
         else if (payload.type === 'stop-stream') stopStream(false);
@@ -49,20 +49,37 @@ function send(payload) {
   channel?.send({ type: 'broadcast', event: 'signal', payload });
 }
 
-async function startStream() {
+// Sortie audio : la voix du dispatcher joue sur le haut-parleur.
+// (l'autoplay est débloqué par le tap "DÉMARRER LE TRACKING" du début
+// de tournée — un geste utilisateur suffit pour toute la session)
+let remoteAudio = null;
+function ensureRemoteAudio() {
+  if (!remoteAudio) {
+    remoteAudio = document.createElement('audio');
+    remoteAudio.autoplay = true;
+    document.body.appendChild(remoteAudio);
+  }
+  return remoteAudio;
+}
+
+async function startStream(withVideo = true) {
   if (pc) stopStream(false); // redémarrage propre si déjà en cours
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      video: withVideo
+        ? { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        : false,
       audio: true,
     });
   } catch (e) {
-    send({ type: 'driver-error', message: 'Caméra refusée ou indisponible : ' + e.message });
+    send({ type: 'driver-error', message: 'Caméra/micro refusé ou indisponible : ' + e.message });
     return;
   }
 
   pc = new RTCPeerConnection(ICE);
   stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+  // interphone : la voix du dispatcher arrive ici
+  pc.ontrack = (e) => { ensureRemoteAudio().srcObject = e.streams[0]; };
   pc.onicecandidate = (e) => {
     if (e.candidate) send({ type: 'ice-driver', candidate: e.candidate });
   };
@@ -80,6 +97,7 @@ function stopStream(notify) {
   if (notify) send({ type: 'driver-stopped' });
   stream?.getTracks().forEach((t) => t.stop());
   stream = null;
+  if (remoteAudio) remoteAudio.srcObject = null;
   pc?.close();
   pc = null;
 }

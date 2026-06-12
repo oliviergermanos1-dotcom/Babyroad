@@ -266,6 +266,20 @@ html, body {
   color: rgba(255,255,255,0.8);
   font-size: 0.8rem;
 }
+.live-box.intercom { max-width: 420px; }
+.intercom-visual {
+  padding: 38px 14px;
+  text-align: center;
+  color: #fff;
+  font-size: 3rem;
+  background: linear-gradient(160deg, #14532D, #1B6B3A);
+}
+.intercom-visual small {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 10px;
+}
 
 /* ── Modal ──────────────────────────────────────────────── */
 .modal {

@@ -121,6 +121,7 @@ export function openTruckPopup(entry, onFollow) {
         <button class="btn btn-secondary" id="popup-follow">📍 Suivre</button>
         <button class="btn btn-danger" id="popup-photo">📸 Photo</button>
         <button class="btn btn-live" id="popup-live">🔴 Live</button>
+        <button class="btn btn-primary" id="popup-talk">🎙 Parler</button>
       </div>
     `)
     .addTo(map);
@@ -138,7 +139,11 @@ export function openTruckPopup(entry, onFollow) {
   });
   popup.getElement().querySelector('#popup-live').addEventListener('click', () => {
     popup.remove();
-    if (onOpenLive) onOpenLive(entry.user.id);
+    if (onOpenLive) onOpenLive(entry.user.id, 'video');
+  });
+  popup.getElement().querySelector('#popup-talk').addEventListener('click', () => {
+    popup.remove();
+    if (onOpenLive) onOpenLive(entry.user.id, 'audio');
   });
 }
 

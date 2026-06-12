@@ -198,8 +198,8 @@ function setupControls(users) {
   // Demande de photo au chauffeur (popup camion → 📸 Photo)
   setRequestPhotoHandler((userId) => requestPhoto(userId));
 
-  // Vidéo en direct bodycam (popup camion → 🔴 Live)
-  setOpenLiveHandler((userId) => openLive(userId));
+  // Vidéo bodycam (🔴 Live) ou interphone audio (🎙 Parler)
+  setOpenLiveHandler((userId, mode) => openLive(userId, mode));
 
   // Bascule fond sombre ↔ clair
   $('btn-style').addEventListener('click', () => {
