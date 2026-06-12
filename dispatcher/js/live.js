@@ -4,7 +4,17 @@
 import { supabase, fleet } from './realtime.js';
 import { toast } from './alerts.js';
 
-const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+// STUN (Google) + TURN relais public OpenRelay/Metered : indispensable
+// sur les réseaux mobiles ivoiriens (NAT symétrique) où le P2P direct
+// échoue. Le TURN relaie le flux quand la connexion directe est bloquée.
+const ICE = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+  ],
+};
 
 let channel = null;
 let pc = null;
@@ -41,8 +51,13 @@ export function openLive(userId) {
     if (e.candidate) send({ type: 'ice-dispatcher', candidate: e.candidate });
   };
   pc.onconnectionstatechange = () => {
-    if (pc?.connectionState === 'failed') {
-      status.textContent = '⚠ Connexion impossible (réseau trop restrictif — un serveur TURN sera nécessaire)';
+    const st = pc?.connectionState;
+    if (st === 'connecting') status.textContent = '🔄 Connexion via relais sécurisé…';
+    else if (st === 'connected') status.textContent = '🔴 En direct — caméra torse du chauffeur';
+    else if (st === 'failed') {
+      // une seule relance auto avant d'abandonner
+      if (!pc._retried) { pc._retried = true; status.textContent = '🔄 Reconnexion…'; send({ type: 'want-stream' }); }
+      else status.textContent = '⚠ Connexion impossible sur ce réseau. Réessayer, ou passer en Wi-Fi côté chauffeur.';
     }
   };
 
@@ -71,10 +86,10 @@ export function openLive(userId) {
         send({ type: 'want-stream' });
         // si l'app tracker n'est pas ouverte, personne ne répond
         watchdog = setTimeout(() => {
-          if (pc && !video.srcObject) {
-            status.textContent = '⚠ Pas de réponse — l\'app tracker doit être OUVERTE sur le téléphone du chauffeur (tracking actif)';
+          if (pc && !video.srcObject && pc.connectionState !== 'connected') {
+            status.textContent = '⚠ Pas de réponse — l\'app tracker doit être OUVERTE sur le téléphone du chauffeur';
           }
-        }, 10000);
+        }, 15000);
       }
     });
 }
