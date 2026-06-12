@@ -1,5 +1,5 @@
 // ── Service Worker — cache app shell (Add to Home Screen) ───
-const CACHE = 'babyroad-tracker-v4';
+const CACHE = 'babyroad-tracker-v5';
 const ASSETS = [
   './index.html',
   './tracker.js',

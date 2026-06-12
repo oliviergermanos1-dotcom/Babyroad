@@ -86,35 +86,6 @@
     #btn-toggle:disabled { opacity: 0.5; }
     .hint { padding: 0 16px 16px; font-size: 0.85rem; opacity: 0.85; text-align: center; }
 
-    .live-banner {
-      margin: 10px 16px 0;
-      background: var(--rouge);
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 12px 14px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      animation: podpulse 1.2s ease-in-out infinite;
-    }
-    .live-dot {
-      width: 13px; height: 13px; min-width: 13px;
-      border-radius: 50%;
-      background: #fff;
-      animation: pulse 1s infinite;
-    }
-    .live-banner button {
-      margin-left: auto;
-      background: rgba(255,255,255,0.25);
-      border: none;
-      color: #fff;
-      font-weight: 700;
-      padding: 8px 12px;
-      border-radius: 9px;
-      cursor: pointer;
-    }
     .pod-banner {
       margin: 0 16px;
       background: var(--orange);
@@ -172,11 +143,6 @@
     <div class="mono">🔋 <span id="battery">—</span>%&nbsp;&nbsp;📶 <span id="network">—</span>&nbsp;&nbsp;<span id="sync">✗ jamais sync</span></div>
     <div class="mono">⏱ Durée : <span id="duration">00:00:00</span></div>
     <div class="mono" style="font-size:0.85rem; opacity:0.8;">Envoyées : <span id="sent-count">0</span> · Rejetées (précision) : <span id="rejected-count">0</span></div>
-  </div>
-
-  <div id="live-banner" class="live-banner" style="display:none">
-    <span class="live-dot"></span> EN DIRECT — le dispatcher voit votre caméra
-    <button id="btn-live-stop">■ Couper</button>
   </div>
 
   <div id="pod-request-banner" class="pod-banner" style="display:none">
