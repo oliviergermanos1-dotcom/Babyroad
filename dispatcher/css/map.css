@@ -159,6 +159,83 @@
   font-weight: 600;
 }
 
+/* ── Légende ────────────────────────────────────────────── */
+.legend {
+  position: absolute;
+  bottom: 36px;
+  left: 12px;
+  z-index: 5;
+  width: 232px;
+}
+.legend-head {
+  width: 100%;
+  background: rgba(13, 27, 42, 0.92);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-body);
+}
+.legend.open .layers-caret { transform: rotate(180deg); }
+.legend-body {
+  display: none;
+  margin-bottom: 6px;
+  background: rgba(13, 27, 42, 0.93);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  max-height: 52vh;
+  overflow-y: auto;
+}
+.legend.open .legend-body { display: block; }
+.legend.open { display: flex; flex-direction: column-reverse; }
+.legend-group {
+  font-weight: 700;
+  color: var(--color-orange-light);
+  text-transform: uppercase;
+  font-size: 0.64rem;
+  letter-spacing: 0.5px;
+  margin: 7px 0 3px;
+}
+.legend-group:first-child { margin-top: 0; }
+.legend-row { display: flex; align-items: center; gap: 7px; padding: 1px 0; flex-wrap: wrap; }
+.legend-row em { opacity: 0.6; font-size: 0.65rem; }
+.lg-dot {
+  width: 11px; height: 11px; min-width: 11px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px currentColor;
+}
+.lg-blink { animation: blink 0.9s step-end infinite; }
+.lg-ico { font-size: 0.85rem; }
+.lg-line {
+  width: 22px; height: 4px; min-width: 22px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.lg-dash {
+  background: repeating-linear-gradient(90deg, #F7941D 0 4px, transparent 4px 8px);
+  height: 3px;
+}
+.lg-hist {
+  background: repeating-linear-gradient(90deg, #FFB347 0 4px, transparent 4px 8px);
+  height: 3px;
+}
+
+@media (max-width: 768px) {
+  .legend { width: 210px; bottom: 30px; }
+}
+
 /* ── Mesure / follow ────────────────────────────────────── */
 .measure-result, .follow-banner {
   position: absolute;

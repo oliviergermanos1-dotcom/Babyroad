@@ -100,6 +100,31 @@
         </div>
       </div>
 
+      <!-- Légende -->
+      <div class="legend" id="legend">
+        <button id="btn-legend" class="legend-head">❓ Légende <span class="layers-caret">▾</span></button>
+        <div class="legend-body">
+          <div class="legend-group">Camions</div>
+          <div class="legend-row"><span class="lg-dot" style="background:#10B981"></span> En route (vert, halo pulsé)</div>
+          <div class="legend-row"><span class="lg-dot" style="background:#F7941D"></span> Arrêté (orange)</div>
+          <div class="legend-row"><span class="lg-dot lg-blink" style="background:#DC2626"></span> Hors zone (rouge clignotant)</div>
+          <div class="legend-row"><span class="lg-dot" style="background:#9CA3AF"></span> Signal perdu (gris)</div>
+          <div class="legend-group">Points fixes</div>
+          <div class="legend-row"><span class="lg-ico" style="color:#DC2626">📡</span> Radar vitesse / feux <em>(indicatif)</em></div>
+          <div class="legend-row"><span class="lg-ico" style="color:#3B82F6">📷</span> Caméra de surveillance</div>
+          <div class="legend-row"><span class="lg-ico" style="color:#F7941D">🎛</span> Centre de supervision</div>
+          <div class="legend-row"><span class="lg-ico">🏛</span> Monument / pont (volume 3D)</div>
+          <div class="legend-group">Lignes & zones</div>
+          <div class="legend-row"><span class="lg-line" style="background:#1B6B3A"></span> Trace récente (couleur du chauffeur)</div>
+          <div class="legend-row"><span class="lg-line lg-dash"></span> Zone surveillée (geofence)</div>
+          <div class="legend-row"><span class="lg-line lg-hist"></span> Historique affiché (pointillé orange)</div>
+          <div class="legend-group">Trafic (si activé)</div>
+          <div class="legend-row"><span class="lg-line" style="background:#22C55E"></span> Fluide
+            <span class="lg-line" style="background:#F59E0B; margin-left:8px"></span> Dense
+            <span class="lg-line" style="background:#DC2626; margin-left:8px"></span> Bouché</div>
+        </div>
+      </div>
+
       <div id="measure-result" class="measure-result hidden"></div>
       <div id="follow-banner" class="follow-banner hidden">
         📍 Suivi : <span id="follow-name"></span>

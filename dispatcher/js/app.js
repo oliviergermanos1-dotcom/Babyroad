@@ -141,6 +141,11 @@ function setupControls(users) {
   // déplié par défaut sur desktop
   if (window.innerWidth > 768) $('layers-control').classList.add('open');
 
+  // Légende (pliée par défaut)
+  $('btn-legend').addEventListener('click', () => {
+    $('legend').classList.toggle('open');
+  });
+
   // Toggles couches
   $('toggle-traffic').addEventListener('change', (e) => {
     if (!setTrafficVisible(e.target.checked)) e.target.checked = false;
