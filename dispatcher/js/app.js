@@ -2,7 +2,8 @@
 // BABYROAD — Dashboard dispatcher : point d'entrée
 // ============================================================
 import { CONFIG } from './config.js';
-import { initMap, map, toggle3D } from './map.js';
+import { initMap, map, toggle3D, switchBaseStyle, mapMode } from './map.js';
+import { drawLandmarks, setLandmarksVisible } from './landmarks.js';
 import {
   fleet, loadInitialState, subscribeRealtime, onFleetUpdate,
 } from './realtime.js';
@@ -16,8 +17,8 @@ import {
 import {
   onPositionAlerts, startSignalWatch, setAlertRenderer, outOfZoneIds, toast,
 } from './alerts.js';
-import { setTrafficVisible } from './traffic.js';
-import { loadWeatherPanel, setRainVisible } from './weather.js';
+import { setTrafficVisible, resetTraffic } from './traffic.js';
+import { loadWeatherPanel, setRainVisible, resetRain } from './weather.js';
 import { startPing } from './benchmark.js';
 import {
   renderDriverCards, openTruckPopup, startFollow, stopFollow, followTick,
@@ -50,6 +51,7 @@ async function main() {
     // Couches de base
     await loadGeofences();
     drawGeofences();
+    drawLandmarks(mapMode());
     users.forEach((u) => ensureTrajectoryLayer(u));
 
     // Marqueurs + traces initiales
@@ -110,6 +112,31 @@ function setupControls(users) {
   });
   document.getElementById('toggle-trajectories').addEventListener('change', (e) => {
     setTrajectoriesVisible(e.target.checked);
+  });
+  document.getElementById('toggle-landmarks').addEventListener('change', (e) => {
+    setLandmarksVisible(e.target.checked);
+  });
+
+  // Bascule fond sombre ↔ clair : setStyle() détruit les couches
+  // custom — on les reconstruit puis on ré-applique l'état des toggles
+  document.getElementById('btn-style').addEventListener('click', () => {
+    switchBaseStyle((newMode) => {
+      drawGeofences();
+      drawLandmarks(newMode);
+      users.forEach((u) => ensureTrajectoryLayer(u));
+      fleet.forEach((entry) => redrawTrajectory(entry.user.id));
+      resetTraffic();
+      resetRain();
+      if (document.getElementById('toggle-traffic').checked) setTrafficVisible(true);
+      if (document.getElementById('toggle-weather').checked) setRainVisible(true);
+      if (!document.getElementById('toggle-geofences').checked) setGeofencesVisible(false);
+      if (!document.getElementById('toggle-trajectories').checked) setTrajectoriesVisible(false);
+      if (!document.getElementById('toggle-landmarks').checked) setLandmarksVisible(false);
+      if (document.getElementById('toggle-buildings') && !document.getElementById('toggle-buildings').checked
+          && map.getLayer('buildings-3d')) {
+        map.setLayoutProperty('buildings-3d', 'visibility', 'none');
+      }
+    });
   });
 
   // 2D/3D + mesure

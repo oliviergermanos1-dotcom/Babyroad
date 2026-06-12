@@ -5,6 +5,9 @@ import { toast } from './alerts.js';
 
 let added = false;
 
+// après un setStyle(), les sources sont détruites → ré-armement
+export function resetTraffic() { added = false; }
+
 export function setTrafficVisible(visible) {
   if (!CONFIG.TOMTOM_API_KEY) {
     if (visible) {

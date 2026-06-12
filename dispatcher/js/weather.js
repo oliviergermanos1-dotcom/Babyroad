@@ -27,6 +27,9 @@ export async function loadWeatherPanel() {
 
 let rainAdded = false;
 
+// après un setStyle(), les sources sont détruites → ré-armement
+export function resetRain() { rainAdded = false; }
+
 export async function setRainVisible(visible) {
   if (!rainAdded && visible) {
     try {
