@@ -248,4 +248,100 @@ function tickDuration() {
   }
 }
 
-init();
+// ── Preuve de livraison (POD) : photos visage / documents ───
+const pod = {
+  banner: document.getElementById('pod-request-banner'),
+  status: document.getElementById('pod-status'),
+  btnFace: document.getElementById('btn-pod-face'),
+  btnDoc: document.getElementById('btn-pod-doc'),
+  inFace: document.getElementById('pod-input-face'),
+  inDoc: document.getElementById('pod-input-doc'),
+};
+let pendingRequestId = null;
+let podChannel = null;
+
+function setupPOD() {
+  pod.btnFace.addEventListener('click', () => pod.inFace.click());
+  pod.btnDoc.addEventListener('click', () => pod.inDoc.click());
+  pod.inFace.addEventListener('change', () => sendPodPhoto(pod.inFace, 'VISAGE'));
+  pod.inDoc.addEventListener('change', () => sendPodPhoto(pod.inDoc, 'DOCUMENT'));
+  subscribePodRequests();
+  ui.select.addEventListener('change', subscribePodRequests);
+}
+
+// Le dispatcher peut demander une photo : bannière + vibration
+function subscribePodRequests() {
+  if (podChannel) supabase.removeChannel(podChannel);
+  const userId = ui.select.value;
+  if (!userId) return;
+  podChannel = supabase
+    .channel(`pod-req-${userId}`)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'babyroad_pod_requests', filter: `user_id=eq.${userId}` },
+      (payload) => {
+        pendingRequestId = payload.new.id;
+        pod.banner.style.display = 'block';
+        try { navigator.vibrate([300, 120, 300, 120, 600]); } catch { /* pas de vibreur */ }
+      })
+    .subscribe();
+}
+
+// Redimensionne (max 1280 px) + compresse en JPEG avant envoi
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('compression'))), 'image/jpeg', 0.72);
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => reject(new Error('image illisible'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function sendPodPhoto(input, kind) {
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  pod.status.textContent = '⏳ Envoi de la photo…';
+  pod.btnFace.disabled = pod.btnDoc.disabled = true;
+  try {
+    const blob = await compressImage(file);
+    const path = `${ui.select.value}/${Date.now()}_${kind.toLowerCase()}.jpg`;
+    const { error: upErr } = await supabase.storage
+      .from('babyroad-pod')
+      .upload(path, blob, { contentType: 'image/jpeg' });
+    if (upErr) throw new Error(upErr.message);
+    const { data: pub } = supabase.storage.from('babyroad-pod').getPublicUrl(path);
+
+    const { error: insErr } = await supabase.from('babyroad_pod').insert({
+      user_id: ui.select.value,
+      kind,
+      lat: lastPosition?.lat ?? null,
+      lng: lastPosition?.lng ?? null,
+      photo_url: pub.publicUrl,
+    });
+    if (insErr) throw new Error(insErr.message);
+
+    if (pendingRequestId) {
+      await supabase.from('babyroad_pod_requests')
+        .update({ status: 'DONE', done_at: new Date().toISOString() })
+        .eq('id', pendingRequestId);
+      pendingRequestId = null;
+      pod.banner.style.display = 'none';
+    }
+    pod.status.textContent = '✅ Photo envoyée au dispatcher';
+  } catch (e) {
+    pod.status.textContent = `❌ Échec : ${e.message}`;
+  } finally {
+    pod.btnFace.disabled = pod.btnDoc.disabled = false;
+    setTimeout(() => { pod.status.textContent = ''; }, 6000);
+  }
+}
+
+init().then(setupPOD);

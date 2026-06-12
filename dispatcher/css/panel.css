@@ -134,6 +134,37 @@
 .latency-warn { color: #92400E; }
 .latency-bad { color: #991B1B; }
 
+/* ── Preuves de livraison ───────────────────────────────── */
+.pod-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.pod-item {
+  background: var(--color-white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: var(--color-text);
+}
+.pod-item img {
+  width: 100%;
+  height: 86px;
+  object-fit: cover;
+  display: block;
+  background: #E5E7EB;
+}
+.pod-meta {
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+.pod-meta strong { font-size: 0.72rem; }
+.pod-meta .mono { color: var(--color-text-muted); }
+
 /* ── Météo ──────────────────────────────────────────────── */
 .weather-panel {
   background: var(--color-white);

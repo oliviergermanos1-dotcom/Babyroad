@@ -112,6 +112,11 @@ export function setSatelliteVisible(visible) {
     );
   }
   map.setLayoutProperty('satellite-layer', 'visibility', visible ? 'visible' : 'none');
+  // en vue satellite, les volumes deviennent translucides : l'imagerie
+  // réelle "texture" les bâtiments par transparence
+  if (map.getLayer('buildings-3d')) {
+    map.setPaintProperty('buildings-3d', 'fill-extrusion-opacity', visible ? 0.5 : 0.88);
+  }
 }
 
 export function toggle3D(btn) {

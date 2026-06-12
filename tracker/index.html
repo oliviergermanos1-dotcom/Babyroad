@@ -85,6 +85,43 @@
     #btn-toggle.stop  { background: var(--rouge); }
     #btn-toggle:disabled { opacity: 0.5; }
     .hint { padding: 0 16px 16px; font-size: 0.85rem; opacity: 0.85; text-align: center; }
+
+    .pod-banner {
+      margin: 0 16px;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      animation: podpulse 1s ease-in-out infinite;
+    }
+    @keyframes podpulse { 50% { transform: scale(1.02); box-shadow: 0 0 18px rgba(247,148,29,0.8); } }
+    .pod-row {
+      display: flex;
+      gap: 10px;
+      margin: 12px 16px 0;
+    }
+    .pod-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.14);
+      border: 2px solid rgba(255,255,255,0.45);
+      color: #fff;
+      border-radius: 12px;
+      padding: 14px 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      line-height: 1.35;
+    }
+    .pod-btn:disabled { opacity: 0.45; }
+    .pod-status {
+      margin: 6px 16px 0;
+      text-align: center;
+      font-size: 0.95rem;
+      min-height: 1.3em;
+    }
   </style>
 </head>
 <body class="stopped">
@@ -107,6 +144,18 @@
     <div class="mono">⏱ Durée : <span id="duration">00:00:00</span></div>
     <div class="mono" style="font-size:0.85rem; opacity:0.8;">Envoyées : <span id="sent-count">0</span> · Rejetées (précision) : <span id="rejected-count">0</span></div>
   </div>
+
+  <div id="pod-request-banner" class="pod-banner" style="display:none">
+    📸 Le dispatcher demande une photo — appuyez sur un bouton ci-dessous
+  </div>
+
+  <div class="pod-row">
+    <button id="btn-pod-face" class="pod-btn">🤳 Visage<br>réceptionnaire</button>
+    <button id="btn-pod-doc" class="pod-btn">📄 Documents<br>de livraison</button>
+  </div>
+  <div id="pod-status" class="pod-status"></div>
+  <input type="file" id="pod-input-face" accept="image/*" capture="user" hidden>
+  <input type="file" id="pod-input-doc" accept="image/*" capture="environment" hidden>
 
   <button id="btn-toggle" class="big-btn start" disabled>▶ DÉMARRER LE TRACKING</button>
   <p class="hint">⚠ PWA : l'écran doit rester allumé (Wake Lock actif pendant le tracking).<br>

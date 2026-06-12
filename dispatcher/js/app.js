@@ -24,10 +24,11 @@ import { startPing } from './benchmark.js';
 import {
   renderDriverCards, openTruckPopup, startFollow, stopFollow, followTick,
   toggleMeasure, handleMeasureClick, renderAlertsList, startClock,
-  setupPanelToggle, setDriverDeleteHandler,
+  setupPanelToggle, setDriverDeleteHandler, setRequestPhotoHandler,
 } from './ui.js';
 import { loadDayHistory, drawHistory, clearHistory, computeStats, exportCSV } from './history.js';
 import { removeDriver, setupDriverModal } from './drivers.js';
+import { loadRecentPOD, subscribePOD, requestPhoto } from './pod.js';
 import {
   applyAtmosphere, setTerrainEnabled, startGeofencePulse, toggleCinematicTour,
 } from './effects.js';
@@ -101,6 +102,8 @@ async function main() {
     loadWeatherPanel();
     setAlertRenderer(renderAlertsList);
     startGeofencePulse();
+    loadRecentPOD();
+    subscribePOD();
 
     setupControls(users);
     hideSplash();
@@ -184,6 +187,14 @@ function setupControls(users) {
 
   // Tour 3D cinématique (orbite au-dessus du Plateau)
   $('btn-tour').addEventListener('click', () => toggleCinematicTour($('btn-tour')));
+
+  // Trafic temps réel Google Maps (seule source couvrant Abidjan — externe)
+  $('btn-gtraffic').addEventListener('click', () => {
+    window.open('https://www.google.com/maps/@5.3360,-4.0160,13z/data=!5m1!1e1', '_blank');
+  });
+
+  // Demande de photo au chauffeur (popup camion → 📸 Photo)
+  setRequestPhotoHandler((userId) => requestPhoto(userId));
 
   // Bascule fond sombre ↔ clair
   $('btn-style').addEventListener('click', () => {
