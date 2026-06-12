@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Pointe vers le haut (nord) — la rotation CSS applique le heading -->
+  <g>
+    <path d="M24 4 L32 16 L16 16 Z" fill="currentColor"/>
+    <rect x="16" y="16" width="16" height="22" rx="3" fill="currentColor"/>
+    <rect x="19" y="19" width="10" height="6" rx="1.5" fill="#FFFFFF" opacity="0.85"/>
+    <circle cx="18" cy="40" r="3.5" fill="#0D1B2A"/>
+    <circle cx="30" cy="40" r="3.5" fill="#0D1B2A"/>
+  </g>
+</svg>

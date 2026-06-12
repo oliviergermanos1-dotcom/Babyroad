@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Babyroad</title>
+  <style>
+    :root { --vert:#1B6B3A; --orange:#F7941D; --rouge:#DC2626; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      background: #0D1B2A;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.5s;
+      user-select: none;
+      padding-top: env(safe-area-inset-top);
+    }
+    body.tracking { background: var(--vert); }
+    body.signal-lost { background: var(--orange); }
+    header {
+      padding: 20px 16px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; }
+    header h1 span { color: var(--orange); }
+    header small { font-size: 0.8rem; opacity: 0.8; }
+    .who { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.25); font-size: 1.1rem; line-height: 1.7; }
+    .who select { width: 100%; font-size: 1.15rem; padding: 14px; border-radius: 10px; border: none; margin-top: 6px; }
+    .status { flex: 1; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; font-size: 1.3rem; font-family: monospace; }
+    .state-line { font-size: 1.45rem; font-weight: 700; font-family: Calibri, Arial, sans-serif; display: flex; align-items: center; gap: 10px; }
+    .dot { width: 17px; height: 17px; border-radius: 50%; background: #6B7280; }
+    body.tracking .dot { background: #4ADE80; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 50% { opacity: 0.3; } }
+    .big-btn {
+      margin: 16px; padding: 24px; font-size: 1.45rem; font-weight: 700;
+      border: none; border-radius: 14px; color: #fff; cursor: pointer;
+    }
+    .big-btn.start { background: var(--orange); }
+    .big-btn.stop { background: var(--rouge); }
+    .big-btn:disabled { opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🟢 Baby<span>road</span></h1>
+    <small>Fleet Tracking</small>
+  </header>
+
+  <div class="who">
+    <label for="driver-select">Conducteur :</label>
+    <select id="driver-select"><option>Chargement…</option></select>
+    <div id="vehicle-line" style="font-size:0.95rem; margin-top:6px;"></div>
+  </div>
+
+  <div class="status">
+    <div class="state-line"><span class="dot"></span><span id="state-label">TRACKING ARRÊTÉ</span></div>
+    <div>📍 <span id="coords">—</span></div>
+    <div>🚗 <span id="speed">0</span> km/h&nbsp;&nbsp;↗ <span id="heading">0</span>°</div>
+    <div>✓ <span id="sync">jamais sync</span>&nbsp;&nbsp;Σ <span id="sent">0</span></div>
+    <div>⏱ <span id="duration">00:00:00</span></div>
+  </div>
+
+  <button id="btn-toggle" class="big-btn start" disabled>▶ DÉMARRER LE TRACKING</button>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

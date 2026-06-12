@@ -1,0 +1,105 @@
+/* ============================================================
+   BABYROAD — Styles globaux + variables design system
+   ============================================================ */
+:root {
+  --color-primary: #1B6B3A;
+  --color-secondary: #F7941D;
+  --color-primary-light: #2E8B57;
+  --color-orange-light: #FFB347;
+  --color-bg-dark: #0D1B2A;
+  --color-surface: #F4F8F4;
+  --color-surface-orange: #FEF6ED;
+  --color-text: #2D2D2D;
+  --color-text-muted: #6B7280;
+  --color-white: #FFFFFF;
+  --color-danger: #DC2626;
+  --color-border: #D1D5DB;
+  --font-display: 'Poppins', Calibri, Arial, sans-serif;
+  --font-body: 'Inter', Calibri, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg-dark);
+  overflow: hidden;
+}
+
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--color-text-muted); font-size: 0.85rem; }
+.hidden { display: none !important; }
+
+/* ── Topbar ─────────────────────────────────────────────── */
+.topbar {
+  height: 56px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { height: 34px; width: 34px; }
+.brand h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; }
+.brand-baby { color: var(--color-white); }
+.brand-road { color: var(--color-secondary); }
+.brand-sub { font-size: 0.78rem; opacity: 0.85; margin-left: 6px; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.ping-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.15);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+.clock { font-size: 0.9rem; }
+
+/* ── Layout ─────────────────────────────────────────────── */
+.layout {
+  display: flex;
+  height: calc(100% - 56px);
+}
+
+/* ── Boutons ────────────────────────────────────────────── */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+.btn-danger {
+  background: var(--color-secondary);
+  color: var(--color-white);
+  border: none;
+}
+.btn:hover { opacity: 0.9; }
+
+/* ── Badges statut ──────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.badge-actif    { background: #D1FAE5; color: #065F46; }
+.badge-arrete   { background: #FEF3C7; color: #92400E; }
+.badge-horszone { background: #FEE2E2; color: #991B1B; }
+.badge-offline  { background: #E5E7EB; color: #4B5563; }

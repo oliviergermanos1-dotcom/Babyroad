@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1B6B3A">
+  <title>Babyroad — Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root {
+      --vert: #1B6B3A; --orange: #F7941D; --rouge: #DC2626; --blanc: #FFFFFF;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', Calibri, Arial, sans-serif;
+      background: var(--vert);
+      color: var(--blanc);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.5s;
+      user-select: none;
+    }
+    body.signal-lost { background: var(--orange); }
+    body.stopped { background: #0D1B2A; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    header {
+      padding: 18px 16px 10px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+    }
+    header img { width: 44px; height: 44px; }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header h1 span { color: var(--orange); }
+    header small { display: block; font-size: 0.75rem; opacity: 0.8; font-weight: 400; }
+
+    .who {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      font-size: 1.05rem; line-height: 1.6;
+    }
+    .who select {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-top: 6px;
+    }
+
+    .status {
+      flex: 1;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 1.25rem;
+    }
+    .status .state-line {
+      font-size: 1.4rem; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #4ADE80;
+      animation: pulse 1.5s infinite;
+    }
+    body.stopped .dot { background: #6B7280; animation: none; }
+    @keyframes pulse { 50% { opacity: 0.3; } }
+
+    .big-btn {
+      margin: 16px;
+      padding: 22px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      color: var(--blanc);
+    }
+    #btn-toggle.start { background: var(--orange); }
+    #btn-toggle.stop  { background: var(--rouge); }
+    #btn-toggle:disabled { opacity: 0.5; }
+    .hint { padding: 0 16px 16px; font-size: 0.85rem; opacity: 0.85; text-align: center; }
+  </style>
+</head>
+<body class="stopped">
+  <header>
+    <img src="icons/icon-192.png" alt="">
+    <h1>Baby<span>road</span><small>Fleet Tracking</small></h1>
+  </header>
+
+  <div class="who">
+    <label for="driver-select">Conducteur :</label>
+    <select id="driver-select"><option>Chargement…</option></select>
+    <div id="vehicle-line" class="mono" style="margin-top:6px; font-size:0.95rem;"></div>
+  </div>
+
+  <div class="status">
+    <div class="state-line"><span class="dot"></span><span id="state-label">TRACKING ARRÊTÉ</span></div>
+    <div class="mono">📍 <span id="coords">—</span></div>
+    <div class="mono">🚗 <span id="speed">0</span> km/h&nbsp;&nbsp;↗ <span id="heading">0</span>°</div>
+    <div class="mono">🔋 <span id="battery">—</span>%&nbsp;&nbsp;📶 <span id="network">—</span>&nbsp;&nbsp;<span id="sync">✗ jamais sync</span></div>
+    <div class="mono">⏱ Durée : <span id="duration">00:00:00</span></div>
+    <div class="mono" style="font-size:0.85rem; opacity:0.8;">Envoyées : <span id="sent-count">0</span> · Rejetées (précision) : <span id="rejected-count">0</span></div>
+  </div>
+
+  <button id="btn-toggle" class="big-btn start" disabled>▶ DÉMARRER LE TRACKING</button>
+  <p class="hint">⚠ PWA : l'écran doit rester allumé (Wake Lock actif pendant le tracking).<br>
+  Pour le tracking écran éteint, installer l'APK Babyroad.</p>
+
+  <script type="module" src="tracker.js"></script>
+</body>
+</html>

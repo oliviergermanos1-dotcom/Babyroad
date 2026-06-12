@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Babyroad — Dispatcher</title>
+  <link rel="icon" href="assets/logo-babyroad.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="css/panel.css">
+  <link rel="stylesheet" href="css/alerts.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo-babyroad.svg" alt="Babyroad" class="brand-logo">
+      <h1><span class="brand-baby">Baby</span><span class="brand-road">road</span></h1>
+      <span class="brand-sub">Fleet Tracking — Grand Abidjan</span>
+    </div>
+    <div class="topbar-right">
+      <span id="ping-status" class="ping-badge" title="Ping Supabase">— ms</span>
+      <span id="clock" class="clock mono"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Panel latéral chauffeurs -->
+    <aside class="panel" id="panel">
+      <div class="panel-section">
+        <h2>🚛 Flotte (<span id="fleet-count">0</span>)</h2>
+        <div id="driver-cards"></div>
+      </div>
+
+      <div class="panel-section">
+        <h2>🌦 Météo Abidjan 72h</h2>
+        <div id="weather-panel" class="weather-panel">Chargement…</div>
+      </div>
+
+      <div class="panel-section">
+        <h2>🔔 Alertes</h2>
+        <div id="alerts-list" class="alerts-list">
+          <p class="muted">Aucune alerte</p>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h2>📊 Historique</h2>
+        <div class="history-controls">
+          <select id="history-driver"></select>
+          <input type="date" id="history-date">
+          <button id="btn-history" class="btn btn-secondary">Afficher</button>
+          <button id="btn-export-csv" class="btn btn-secondary">⬇ Export CSV</button>
+        </div>
+        <div id="history-stats" class="history-stats"></div>
+      </div>
+    </aside>
+
+    <!-- Carte -->
+    <div id="map-container">
+      <div id="map"></div>
+
+      <!-- Toggles couches -->
+      <div class="map-toggles">
+        <label><input type="checkbox" id="toggle-traffic"> Trafic</label>
+        <label><input type="checkbox" id="toggle-weather"> Pluie</label>
+        <label><input type="checkbox" id="toggle-buildings" checked> 3D bât.</label>
+        <label><input type="checkbox" id="toggle-geofences" checked> Zones</label>
+        <label><input type="checkbox" id="toggle-trajectories" checked> Traces</label>
+        <button id="btn-23d" class="btn-map" title="Bascule 2D / 3D">3D</button>
+        <button id="btn-measure" class="btn-map" title="Mesurer une distance">📏</button>
+      </div>
+
+      <div id="measure-result" class="measure-result hidden"></div>
+      <div id="follow-banner" class="follow-banner hidden">
+        📍 Suivi : <span id="follow-name"></span>
+        <button id="btn-unfollow">✕</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast-container"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

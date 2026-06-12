@@ -1,0 +1,15 @@
+{
+  "appId": "com.babyroad.tracker",
+  "appName": "Babyroad",
+  "webDir": "www",
+  "backgroundColor": "#1B6B3A",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_babyroad",
+      "iconColor": "#1B6B3A"
+    }
+  }
+}
