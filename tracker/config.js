@@ -11,4 +11,10 @@ export const CONFIG = {
   GPS_ACCURACY_MAX_M: 50,           // rejette précision > 50m (contrainte #8)
   IDLE_AFTER_MS: 120000,            // immobile = 0 km/h pendant 2 min
   MOVING_SPEED_KMH: 5,
+
+  // ── TURN dédié (vidéo live) — mêmes valeurs que le dispatcher ──
+  // Compte gratuit metered.ca → onglet "TURN Server". Vide = fallback public.
+  TURN_URL: '',
+  TURN_USERNAME: '',
+  TURN_CREDENTIAL: '',
 };

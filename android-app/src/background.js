@@ -16,9 +16,12 @@ export async function startTracking(userId) {
   watcherId = await BackgroundGeolocation.addWatcher(
     {
       backgroundTitle: 'Babyroad — Tracking actif',
-      backgroundMessage: "GPS en cours d'enregistrement",
+      backgroundMessage: 'GPS en cours (toucher pour ouvrir)',
       requestPermissions: true,
+      // stale:false → ignore les positions périmées (anti-dérive batterie)
       stale: false,
+      // ÉCONOMIE BATTERIE : le GPS ne se réveille qu'au déplacement de
+      // 15 m. Camion à l'arrêt = aucune mesure = quasi zéro conso.
       distanceFilter: CONFIG.DISTANCE_FILTER_M,
     },
     async (position, error) => {

@@ -35,4 +35,13 @@ export const CONFIG = {
 
   // ── Météo Open-Meteo (aucune clé requise) ─────────────────
   OPEN_METEO_URL: 'https://api.open-meteo.com/v1/forecast',
+
+  // ── TURN dédié (vidéo live) ───────────────────────────────
+  // Relais vidéo. Le public OpenRelay (fallback) sature : pour un live
+  // fiable sur 4G ivoirienne, créer un compte GRATUIT sur metered.ca
+  // (50 Go/mois), onglet "TURN Server" → coller les 2 valeurs ci-dessous.
+  // Laisser vide = fallback OpenRelay public.
+  TURN_URL: '',        // ex: 'turn:standard.relay.metered.ca:443'
+  TURN_USERNAME: '',
+  TURN_CREDENTIAL: '',
 };

@@ -3,18 +3,11 @@
 // flux ('want-stream'), négocie le WebRTC et affiche la vidéo en overlay.
 import { supabase, fleet } from './realtime.js';
 import { toast } from './alerts.js';
+import { CONFIG } from './config.js';
+import { buildIce } from './ice.js';
 
-// STUN (Google) + TURN relais public OpenRelay/Metered : indispensable
-// sur les réseaux mobiles ivoiriens (NAT symétrique) où le P2P direct
-// échoue. Le TURN relaie le flux quand la connexion directe est bloquée.
-const ICE = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-    { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-  ],
-};
+// STUN + TURN dédié (CONFIG) si renseigné, sinon relais public OpenRelay.
+const ICE = buildIce(CONFIG);
 
 let channel = null;
 let pc = null;
