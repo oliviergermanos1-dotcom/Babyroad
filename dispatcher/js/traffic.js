@@ -1,12 +1,15 @@
 // ── TomTom Traffic Flow — source trafic UNIQUE (contrainte #4)
 import { map } from './map.js';
 import { CONFIG } from './config.js';
+import { toast } from './alerts.js';
 
 let added = false;
 
 export function setTrafficVisible(visible) {
   if (!CONFIG.TOMTOM_API_KEY) {
-    if (visible) alert('Clé TomTom manquante — renseigner TOMTOM_API_KEY dans js/config.js');
+    if (visible) {
+      toast('Couche trafic : clé TomTom requise (gratuite sur developer.tomtom.com) — à coller dans dispatcher/js/config.js', true);
+    }
     return false;
   }
   if (!added) {

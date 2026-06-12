@@ -43,7 +43,18 @@ html, body {
   justify-content: space-between;
   padding: 0 16px;
 }
-.brand { display: flex; align-items: center; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.btn-panel {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: var(--color-white);
+  font-size: 1.35rem;
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.btn-panel:active { background: rgba(255,255,255,0.3); }
 .brand-logo { height: 34px; width: 34px; }
 .brand h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; }
 .brand-baby { color: var(--color-white); }
@@ -63,6 +74,46 @@ html, body {
 .layout {
   display: flex;
   height: calc(100% - 56px);
+}
+
+/* Desktop : panel rétractable côte à côte */
+.panel.collapsed { display: none; }
+.btn-panel-close { display: none; }
+
+/* Mobile : panel en tiroir au-dessus de la carte */
+@media (max-width: 768px) {
+  .brand-sub { display: none; }
+  .brand h1 { font-size: 1.15rem; }
+  .panel {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 88%;
+    max-width: 340px;
+    min-width: 0;
+    z-index: 30;
+    box-shadow: 6px 0 28px rgba(0,0,0,0.45);
+    transform: translateX(0);
+    transition: transform 0.25s ease;
+    display: flex;
+  }
+  .panel.collapsed {
+    display: flex;
+    transform: translateX(-110%);
+  }
+  .btn-panel-close {
+    display: block;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .map-toggles { max-width: 86%; font-size: 0.72rem; gap: 7px; padding: 6px 9px; }
 }
 
 /* ── Boutons ────────────────────────────────────────────── */

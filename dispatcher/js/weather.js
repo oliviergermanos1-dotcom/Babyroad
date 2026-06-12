@@ -32,12 +32,20 @@ export async function setRainVisible(visible) {
     try {
       const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
       const meta = await res.json();
-      const frame = meta.radar?.past?.at(-1);
+      // Pas de radar météo en Côte d'Ivoire → satellite infrarouge (mondial).
+      // Les nuages denses (blanc vif) = cellules de pluie probables.
+      const sat = meta.satellite?.infrared?.at(-1);
+      const radar = meta.radar?.past?.at(-1);
+      const frame = sat || radar;
       if (!frame) return;
+      const opts = sat ? '0/0_0' : '2/1_1';
       map.addSource('rain', {
         type: 'raster',
-        tiles: [`https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/2/1_1.png`],
+        tiles: [`https://tilecache.rainviewer.com${frame.path}/256/{z}/{x}/{y}/${opts}.png`],
         tileSize: 256,
+        // au-delà, MapLibre agrandit les tuiles existantes
+        // (évite les tuiles "Zoom Level Not Supported")
+        maxzoom: 6,
       });
       map.addLayer({
         id: 'weather-layer',

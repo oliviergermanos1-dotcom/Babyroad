@@ -22,6 +22,7 @@ import { startPing } from './benchmark.js';
 import {
   renderDriverCards, openTruckPopup, startFollow, stopFollow, followTick,
   toggleMeasure, handleMeasureClick, renderAlertsList, startClock,
+  setupPanelToggle,
 } from './ui.js';
 import { loadDayHistory, drawHistory, clearHistory, computeStats, exportCSV } from './history.js';
 
@@ -35,6 +36,7 @@ async function main() {
 
   startClock();
   initMap();
+  setupPanelToggle();
 
   map.on('load', async () => {
     let users = [];

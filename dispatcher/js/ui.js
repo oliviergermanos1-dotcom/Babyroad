@@ -156,6 +156,19 @@ export function renderAlertsList(alerts) {
     </div>`).join('');
 }
 
+// ── Panel rétractable (☰) — replié par défaut sur mobile ────
+export function setupPanelToggle() {
+  const panel = document.getElementById('panel');
+  const toggle = () => {
+    panel.classList.toggle('collapsed');
+    // la carte doit recalculer sa taille après le reflow
+    setTimeout(() => map && map.resize(), 300);
+  };
+  document.getElementById('btn-panel').addEventListener('click', toggle);
+  document.getElementById('btn-panel-close').addEventListener('click', toggle);
+  if (window.innerWidth <= 768) panel.classList.add('collapsed');
+}
+
 // ── Horloge topbar ──────────────────────────────────────────
 export function startClock() {
   const el = document.getElementById('clock');

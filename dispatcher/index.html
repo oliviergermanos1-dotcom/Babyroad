@@ -15,8 +15,9 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <img src="assets/logo-babyroad.svg" alt="Babyroad" class="brand-logo">
-      <h1><span class="brand-baby">Baby</span><span class="brand-road">road</span></h1>
+      <button id="btn-panel" class="btn-panel" title="Afficher / masquer le panneau">☰</button>
+      <img src="assets/logo-babyroad.svg" alt="BabyRoad" class="brand-logo">
+      <h1><span class="brand-baby">Baby</span><span class="brand-road">Road</span></h1>
       <span class="brand-sub">Fleet Tracking — Grand Abidjan</span>
     </div>
     <div class="topbar-right">
@@ -28,6 +29,7 @@
   <main class="layout">
     <!-- Panel latéral chauffeurs -->
     <aside class="panel" id="panel">
+      <button id="btn-panel-close" class="btn-panel-close" title="Fermer">✕ Fermer — voir la carte</button>
       <div class="panel-section">
         <h2>🚛 Flotte (<span id="fleet-count">0</span>)</h2>
         <div id="driver-cards"></div>

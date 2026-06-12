@@ -1,7 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="30" fill="#1B6B3A"/>
-  <path d="M14 44 Q 32 18 50 44" stroke="#FFFFFF" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="8 6"/>
-  <circle cx="32" cy="24" r="7" fill="#F7941D"/>
-  <path d="M32 16 Q 38 24 32 33 Q 26 24 32 16 Z" fill="#F7941D"/>
-  <circle cx="32" cy="24" r="3" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!-- B formé de deux routes (verte + orange) avec lignes médianes blanches -->
+  <!-- barre verticale + boucle basse : route verte -->
+  <path d="M38 18 V 102" stroke="#1B6B3A" stroke-width="17" stroke-linecap="round" fill="none"/>
+  <path d="M38 60 H 62 a 21 21 0 1 1 0 42 H 38" stroke="#1B6B3A" stroke-width="17" stroke-linecap="round" fill="none"/>
+  <!-- boucle haute : route orange -->
+  <path d="M38 18 H 58 a 18.5 18.5 0 1 1 0 37 H 38" stroke="#F7941D" stroke-width="17" stroke-linecap="round" fill="none"/>
+  <!-- lignes médianes pointillées blanches -->
+  <path d="M38 18 V 102" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="7 7" fill="none"/>
+  <path d="M38 60 H 62 a 21 21 0 1 1 0 42 H 38" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="7 7" fill="none"/>
+  <path d="M38 18 H 58 a 18.5 18.5 0 1 1 0 37 H 38" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="7 7" fill="none"/>
+  <!-- pin de localisation orange -->
+  <path d="M93 8 a 15 15 0 0 1 15 15 c 0 11 -15 26 -15 26 c 0 0 -15 -15 -15 -26 a 15 15 0 0 1 15 -15 Z" fill="#F7941D"/>
+  <circle cx="93" cy="23" r="6" fill="#FFFFFF"/>
 </svg>
