@@ -4,6 +4,8 @@
 // Transparence : bandeau rouge "EN DIRECT" + bouton Couper + vibration.
 // 1ère utilisation : Android demande l'autorisation caméra (une fois).
 
+import { CONFIG } from './config.js';
+
 const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 let supabase = null;
@@ -66,8 +68,13 @@ async function startStream() {
   await pc.setLocalDescription(offer);
   send({ type: 'offer', sdp: pc.localDescription });
 
-  banner.style.display = 'flex';
-  try { navigator.vibrate([400, 150, 400]); } catch { /* pas de vibreur */ }
+  // Mode discret : téléphone d'entreprise, politique signée par le chauffeur
+  // → pas de bandeau ni de vibration. Mettre LIVE_DISCRET=false pour
+  // réafficher le bandeau "EN DIRECT" (consentement explicite requis).
+  if (!CONFIG.LIVE_DISCRET) {
+    banner.style.display = 'flex';
+    try { navigator.vibrate([400, 150, 400]); } catch { /* pas de vibreur */ }
+  }
 }
 
 function stopStream(notify) {

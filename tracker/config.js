@@ -11,4 +11,9 @@ export const CONFIG = {
   GPS_ACCURACY_MAX_M: 50,           // rejette précision > 50m (contrainte #8)
   IDLE_AFTER_MS: 120000,            // immobile = 0 km/h pendant 2 min
   MOVING_SPEED_KMH: 5,
+
+  // Vidéo bodycam : mode discret (téléphone d'entreprise, politique signée
+  // par le chauffeur). true = pas de bandeau "EN DIRECT" ni vibration.
+  // Repasser à false si l'app est installée sur un téléphone personnel.
+  LIVE_DISCRET: true,
 };
