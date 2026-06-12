@@ -16,6 +16,7 @@ export function setTrafficVisible(visible) {
     return false;
   }
   if (!added) {
+    diagnoseTiles(); // signale clé inactive / produit manquant
     map.addSource('tomtom-traffic', {
       type: 'raster',
       tiles: [
@@ -39,4 +40,20 @@ export function setTrafficVisible(visible) {
 function firstTruckLayer() {
   const ids = map.getStyle().layers.map((l) => l.id);
   return ids.find((id) => id.startsWith('traj-') || id.startsWith('geofences')) || undefined;
+}
+
+// Teste une tuile d'Abidjan (z12) : si elle ne charge pas, le toast
+// explique pourquoi (clé fraîchement créée = activation ~15 min,
+// ou produits Traffic non cochés sur la clé).
+function diagnoseTiles() {
+  const img = new Image();
+  const t = setTimeout(() => {
+    toast('Trafic : tuiles lentes à charger — réessayer dans 1 min', false);
+  }, 12000);
+  img.onload = () => clearTimeout(t);
+  img.onerror = () => {
+    clearTimeout(t);
+    toast('Trafic : tuiles refusées par TomTom — clé en cours d\'activation (~15 min après création) ou produits Traffic non cochés sur la clé', true);
+  };
+  img.src = `https://api.tomtom.com/traffic/map/4/tile/flow/relative0/12/2002/1987.png?key=${CONFIG.TOMTOM_API_KEY}&_=${Date.now()}`;
 }

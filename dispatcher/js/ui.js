@@ -15,9 +15,27 @@ const STATUS_LABEL = {
 let followUserId = null;
 
 // ── Cards chauffeurs ────────────────────────────────────────
+let onDeleteDriver = null;
+export function setDriverDeleteHandler(fn) { onDeleteDriver = fn; }
+
+function initials(name) {
+  return (name || '?').split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+function renderFleetChips(fleet) {
+  const counts = { actif: 0, arrete: 0, horszone: 0, offline: 0 };
+  fleet.forEach((entry) => { counts[truckStatus(entry, outOfZoneIds)] += 1; });
+  document.getElementById('fleet-chips').innerHTML = `
+    <span class="fleet-chip actif"><span class="dot-chip"></span>${counts.actif} en route</span>
+    <span class="fleet-chip arrete"><span class="dot-chip"></span>${counts.arrete} arrêtés</span>
+    ${counts.horszone ? `<span class="fleet-chip horszone"><span class="dot-chip"></span>${counts.horszone} hors zone</span>` : ''}
+    <span class="fleet-chip offline"><span class="dot-chip"></span>${counts.offline} hors ligne</span>`;
+}
+
 export function renderDriverCards(fleet) {
   const container = document.getElementById('driver-cards');
   document.getElementById('fleet-count').textContent = fleet.size;
+  renderFleetChips(fleet);
   container.innerHTML = '';
 
   fleet.forEach((entry) => {
@@ -30,9 +48,12 @@ export function renderDriverCards(fleet) {
     card.className = `driver-card ${status}`;
     card.innerHTML = `
       <div class="driver-card-head">
-        <div>
-          <div class="driver-name">${user.full_name}</div>
-          <div class="driver-vehicle">${user.vehicle_id || ''} · ${user.vehicle_type || ''}</div>
+        <div class="driver-id">
+          <span class="driver-avatar" style="background:${user.marker_color || '#1B6B3A'}">${initials(user.full_name)}</span>
+          <div>
+            <div class="driver-name">${user.full_name}</div>
+            <div class="driver-vehicle">${user.vehicle_id || ''} · ${user.vehicle_type || ''}</div>
+          </div>
         </div>
         <span class="badge ${badgeCls}">${label}</span>
       </div>
@@ -49,9 +70,14 @@ export function renderDriverCards(fleet) {
         <span>↻ ${updatesPerMinute(entry)}/min</span>
         <span>Σ ${entry.counters.distanceKm.toFixed(1)} km</span>
       </div>` : '<p class="muted">Aucune position reçue</p>'}
+      <button class="btn-del-driver" title="Retirer ce chauffeur de la flotte">🗑</button>
     `;
     card.addEventListener('click', () => {
       if (p) map.flyTo({ center: [p.lng, p.lat], zoom: 15 });
+    });
+    card.querySelector('.btn-del-driver').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (onDeleteDriver) onDeleteDriver(user);
     });
     container.appendChild(card);
   });

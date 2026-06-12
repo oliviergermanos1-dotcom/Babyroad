@@ -48,10 +48,28 @@ export async function upsertMarker(entry, outOfZoneIds) {
     markers.set(user.id, m);
   }
 
-  m.marker.setLngLat([position.lng, position.lat]);
+  animateTo(m, [position.lng, position.lat]);
   m.el.className = `truck-marker ${status}`;
   m.iconEl.style.color = color;
   m.iconEl.style.transform = `rotate(${position.heading || 0}deg)`;
+}
+
+// Glissement fluide vers la nouvelle position (au lieu d'un saut)
+function animateTo(m, to, duration = 900) {
+  const from = m.marker.getLngLat();
+  if (Math.abs(from.lng - to[0]) < 1e-9 && Math.abs(from.lat - to[1]) < 1e-9) return;
+  cancelAnimationFrame(m.anim);
+  const start = performance.now();
+  const step = (t) => {
+    const k = Math.min(1, (t - start) / duration);
+    const e = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k; // easeInOut
+    m.marker.setLngLat([
+      from.lng + (to[0] - from.lng) * e,
+      from.lat + (to[1] - from.lat) * e,
+    ]);
+    if (k < 1) m.anim = requestAnimationFrame(step);
+  };
+  m.anim = requestAnimationFrame(step);
 }
 
 export function getMarker(userId) { return markers.get(userId); }

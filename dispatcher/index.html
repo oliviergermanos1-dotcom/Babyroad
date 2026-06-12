@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Babyroad — Dispatcher</title>
+  <title>BabyRoad — Dispatcher</title>
   <link rel="icon" href="assets/logo-babyroad.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/map.css">
@@ -13,6 +13,14 @@
   <link rel="stylesheet" href="css/alerts.css">
 </head>
 <body>
+  <!-- Splash de chargement -->
+  <div id="splash">
+    <img src="assets/logo-babyroad.svg" alt="">
+    <h1><span class="brand-baby">Baby</span><span class="brand-road">Road</span></h1>
+    <div class="splash-spinner"></div>
+    <p>Connexion à la flotte…</p>
+  </div>
+
   <header class="topbar">
     <div class="brand">
       <button id="btn-panel" class="btn-panel" title="Afficher / masquer le panneau">☰</button>
@@ -27,11 +35,16 @@
   </header>
 
   <main class="layout">
-    <!-- Panel latéral chauffeurs -->
+    <!-- Panel latéral -->
     <aside class="panel" id="panel">
       <button id="btn-panel-close" class="btn-panel-close" title="Fermer">✕ Fermer — voir la carte</button>
+
       <div class="panel-section">
-        <h2>🚛 Flotte (<span id="fleet-count">0</span>)</h2>
+        <div class="section-head">
+          <h2>🚛 Flotte (<span id="fleet-count">0</span>)</h2>
+          <button id="btn-add-driver" class="btn-icon" title="Ajouter un chauffeur">➕</button>
+        </div>
+        <div id="fleet-chips" class="fleet-chips"></div>
         <div id="driver-cards"></div>
       </div>
 
@@ -63,17 +76,26 @@
     <div id="map-container">
       <div id="map"></div>
 
-      <!-- Toggles couches -->
-      <div class="map-toggles">
-        <label><input type="checkbox" id="toggle-traffic"> Trafic</label>
-        <label><input type="checkbox" id="toggle-weather"> Pluie</label>
-        <label><input type="checkbox" id="toggle-buildings" checked> 3D bât.</label>
-        <label><input type="checkbox" id="toggle-geofences" checked> Zones</label>
-        <label><input type="checkbox" id="toggle-trajectories" checked> Traces</label>
-        <label><input type="checkbox" id="toggle-landmarks" checked> Monuments</label>
-        <button id="btn-style" class="btn-map" title="Fond clair / sombre">🌓</button>
-        <button id="btn-23d" class="btn-map" title="Bascule 2D / 3D">3D</button>
-        <button id="btn-measure" class="btn-map" title="Mesurer une distance">📏</button>
+      <!-- Contrôle de couches -->
+      <div class="layers-control" id="layers-control">
+        <button id="btn-layers" class="layers-head" title="Couches de la carte">
+          🗺 Couches <span class="layers-caret">▾</span>
+        </button>
+        <div class="layers-body" id="layers-body">
+          <label class="layer-pill"><input type="checkbox" id="toggle-traffic"><span>🚦 Trafic</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-satellite"><span>🛰 Satellite</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-weather"><span>🌧 Pluie</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-buildings" checked><span>🏙 3D bât.</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-geofences" checked><span>📍 Zones</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-trajectories" checked><span>〰 Traces</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-landmarks" checked><span>🏛 Monuments</span></label>
+          <label class="layer-pill"><input type="checkbox" id="toggle-cameras" checked><span>📡 Radars</span></label>
+          <div class="layers-actions">
+            <button id="btn-style" class="btn-map" title="Fond clair / sombre">🌓 Fond</button>
+            <button id="btn-23d" class="btn-map" title="Bascule 2D / 3D">2D</button>
+            <button id="btn-measure" class="btn-map" title="Mesurer une distance">📏</button>
+          </div>
+        </div>
       </div>
 
       <div id="measure-result" class="measure-result hidden"></div>
@@ -83,6 +105,37 @@
       </div>
     </div>
   </main>
+
+  <!-- Modal ajout chauffeur -->
+  <div id="driver-modal" class="modal hidden">
+    <form id="driver-form" class="modal-card">
+      <h3>➕ Nouveau chauffeur</h3>
+      <label>Nom complet *
+        <input name="full_name" required placeholder="Koné Mamadou">
+      </label>
+      <label>Téléphone
+        <input name="phone" placeholder="+225 07 XX XX XX XX">
+      </label>
+      <label>Véhicule
+        <input name="vehicle_id" placeholder="CAM-005">
+      </label>
+      <label>Type
+        <select name="vehicle_type">
+          <option value="porteur">Porteur</option>
+          <option value="semi-remorque">Semi-remorque</option>
+          <option value="citerne">Citerne</option>
+          <option value="fourgon">Fourgon</option>
+        </select>
+      </label>
+      <label>Couleur du marqueur
+        <input name="marker_color" type="color" value="#1B6B3A">
+      </label>
+      <div class="modal-actions">
+        <button type="button" id="driver-modal-cancel" class="btn btn-secondary">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </div>
 
   <div id="toast-container"></div>
 

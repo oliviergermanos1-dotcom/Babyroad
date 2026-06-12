@@ -75,32 +75,81 @@
 .popup-grid dd { font-family: var(--font-mono); }
 .popup-actions { margin-top: 10px; display: flex; gap: 6px; }
 
-/* ── Toggles couches ────────────────────────────────────── */
-.map-toggles {
+/* ── Contrôle de couches ────────────────────────────────── */
+.layers-control {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: rgba(13, 27, 42, 0.85);
-  border-radius: 10px;
-  padding: 8px 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  color: #fff;
-  font-size: 0.78rem;
   z-index: 5;
-  max-width: 70%;
+  width: 178px;
 }
-.map-toggles label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-.btn-map {
+.layers-head {
+  width: 100%;
+  background: rgba(13, 27, 42, 0.92);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-body);
+}
+.layers-caret { transition: transform 0.2s; }
+.layers-control.open .layers-caret { transform: rotate(180deg); }
+.layers-body {
+  display: none;
+  margin-top: 6px;
+  background: rgba(13, 27, 42, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 8px;
+  flex-direction: column;
+  gap: 5px;
+}
+.layers-control.open .layers-body { display: flex; }
+.layer-pill {
+  display: block;
+  cursor: pointer;
+}
+.layer-pill input { display: none; }
+.layer-pill span {
+  display: block;
+  color: rgba(255,255,255,0.75);
+  font-size: 0.8rem;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.06);
+  transition: background 0.15s, color 0.15s;
+}
+.layer-pill input:checked + span {
   background: var(--color-primary);
   color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+}
+.layers-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.btn-map {
+  flex: 1;
+  background: var(--color-secondary);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 4px 10px;
+  border-radius: 9px;
+  padding: 7px 4px;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 
 /* ── Mesure / follow ────────────────────────────────────── */

@@ -17,6 +17,8 @@
   --font-display: 'Poppins', Calibri, Arial, sans-serif;
   --font-body: 'Inter', Calibri, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --shadow-card: 0 2px 10px rgba(13, 27, 42, 0.08);
+  --shadow-pop: 0 10px 36px rgba(13, 27, 42, 0.35);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,15 +35,45 @@ html, body {
 .muted { color: var(--color-text-muted); font-size: 0.85rem; }
 .hidden { display: none !important; }
 
+/* ── Splash de chargement ───────────────────────────────── */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #0D1B2A 0%, #11321F 100%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--color-white);
+  transition: opacity 0.4s;
+}
+#splash.fade { opacity: 0; pointer-events: none; }
+#splash img { width: 92px; height: 92px; }
+#splash h1 { font-family: var(--font-display); font-size: 2rem; }
+#splash p { opacity: 0.7; font-size: 0.9rem; }
+.splash-spinner {
+  width: 34px; height: 34px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* ── Topbar ─────────────────────────────────────────────── */
 .topbar {
   height: 56px;
-  background: var(--color-primary);
+  background: linear-gradient(95deg, #14532D 0%, #1B6B3A 55%, #237A45 100%);
   color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  position: relative;
+  z-index: 40;
 }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .btn-panel {
@@ -49,18 +81,18 @@ html, body {
   border: none;
   color: var(--color-white);
   font-size: 1.35rem;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 4px 12px;
   cursor: pointer;
   line-height: 1.4;
 }
 .btn-panel:active { background: rgba(255,255,255,0.3); }
-.brand-logo { height: 34px; width: 34px; }
-.brand h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; }
+.brand-logo { height: 36px; width: 36px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)); }
+.brand h1 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; letter-spacing: 0.3px; }
 .brand-baby { color: var(--color-white); }
 .brand-road { color: var(--color-secondary); }
 .brand-sub { font-size: 0.78rem; opacity: 0.85; margin-left: 6px; }
-.topbar-right { display: flex; align-items: center; gap: 14px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
 .ping-badge {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -89,8 +121,8 @@ html, body {
     top: 56px;
     left: 0;
     bottom: 0;
-    width: 88%;
-    max-width: 340px;
+    width: 90%;
+    max-width: 350px;
     min-width: 0;
     z-index: 30;
     box-shadow: 6px 0 28px rgba(0,0,0,0.45);
@@ -113,7 +145,6 @@ html, body {
     font-weight: 600;
     cursor: pointer;
   }
-  .map-toggles { max-width: 86%; font-size: 0.72rem; gap: 7px; padding: 6px 9px; }
 }
 
 /* ── Boutons ────────────────────────────────────────────── */
@@ -141,6 +172,20 @@ html, body {
   border: none;
 }
 .btn:hover { opacity: 0.9; }
+.btn-icon {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-icon:hover { background: var(--color-primary-light); }
 
 /* ── Badges statut ──────────────────────────────────────── */
 .badge {
@@ -149,8 +194,69 @@ html, body {
   border-radius: 12px;
   font-size: 0.72rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 .badge-actif    { background: #D1FAE5; color: #065F46; }
 .badge-arrete   { background: #FEF3C7; color: #92400E; }
 .badge-horszone { background: #FEE2E2; color: #991B1B; }
 .badge-offline  { background: #E5E7EB; color: #4B5563; }
+
+/* ── Modal ──────────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 27, 42, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-card {
+  background: var(--color-white);
+  border-radius: 16px;
+  padding: 22px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-card h3 {
+  font-family: var(--font-display);
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+.modal-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+.modal-card input, .modal-card select {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--color-text);
+}
+.modal-card input:focus, .modal-card select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(27,107,58,0.15);
+}
+.modal-card input[type=color] { height: 44px; padding: 4px; cursor: pointer; }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

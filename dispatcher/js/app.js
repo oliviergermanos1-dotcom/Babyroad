@@ -2,8 +2,9 @@
 // BABYROAD — Dashboard dispatcher : point d'entrée
 // ============================================================
 import { CONFIG } from './config.js';
-import { initMap, map, toggle3D, switchBaseStyle, mapMode } from './map.js';
+import { initMap, map, toggle3D, switchBaseStyle, mapMode, setSatelliteVisible } from './map.js';
 import { drawLandmarks, setLandmarksVisible } from './landmarks.js';
+import { drawCameras, setCamerasVisible } from './cameras.js';
 import {
   fleet, loadInitialState, subscribeRealtime, onFleetUpdate,
 } from './realtime.js';
@@ -23,15 +24,26 @@ import { startPing } from './benchmark.js';
 import {
   renderDriverCards, openTruckPopup, startFollow, stopFollow, followTick,
   toggleMeasure, handleMeasureClick, renderAlertsList, startClock,
-  setupPanelToggle,
+  setupPanelToggle, setDriverDeleteHandler,
 } from './ui.js';
 import { loadDayHistory, drawHistory, clearHistory, computeStats, exportCSV } from './history.js';
+import { removeDriver, setupDriverModal } from './drivers.js';
+
+const $ = (id) => document.getElementById(id);
+const checked = (id) => $(id).checked;
+
+function hideSplash() {
+  const s = $('splash');
+  s.classList.add('fade');
+  setTimeout(() => s.remove(), 450);
+}
 
 async function main() {
   if (!CONFIG.SUPABASE_ANON_KEY) {
     document.body.insertAdjacentHTML('afterbegin',
-      '<div style="background:#DC2626;color:#fff;padding:12px;text-align:center;font-family:sans-serif">' +
+      '<div style="background:#DC2626;color:#fff;padding:12px;text-align:center;font-family:sans-serif;z-index:300;position:relative">' +
       '⚠ SUPABASE_ANON_KEY manquante — renseigner dispatcher/js/config.js</div>');
+    $('splash').remove();
     return;
   }
 
@@ -44,15 +56,14 @@ async function main() {
     try {
       users = await loadInitialState();
     } catch (e) {
+      hideSplash();
       toast(`Erreur Supabase : ${e.message}`, true);
       return;
     }
 
     // Couches de base
     await loadGeofences();
-    drawGeofences();
-    drawLandmarks(mapMode());
-    users.forEach((u) => ensureTrajectoryLayer(u));
+    drawAllOverlays(users);
 
     // Marqueurs + traces initiales
     fleet.forEach((entry) => {
@@ -87,75 +98,109 @@ async function main() {
     setAlertRenderer(renderAlertsList);
 
     setupControls(users);
+    hideSplash();
   });
+}
+
+// Dessine toutes les couches custom + ré-applique l'état des toggles.
+// Utilisé au chargement ET après un changement de fond (setStyle détruit tout).
+function drawAllOverlays(users) {
+  drawGeofences();
+  drawLandmarks(mapMode());
+  drawCameras();
+  users.forEach((u) => ensureTrajectoryLayer(u));
+  fleet.forEach((entry) => redrawTrajectory(entry.user.id));
+
+  if (checked('toggle-satellite')) setSatelliteVisible(true);
+  if (checked('toggle-traffic')) setTrafficVisible(true);
+  if (checked('toggle-weather')) setRainVisible(true);
+  if (!checked('toggle-geofences')) setGeofencesVisible(false);
+  if (!checked('toggle-trajectories')) setTrajectoriesVisible(false);
+  if (!checked('toggle-landmarks')) setLandmarksVisible(false);
+  if (!checked('toggle-cameras')) setCamerasVisible(false);
+  if (!checked('toggle-buildings') && map.getLayer('buildings-3d')) {
+    map.setLayoutProperty('buildings-3d', 'visibility', 'none');
+  }
 }
 
 function setupControls(users) {
   // Clic marqueur → fiche popup
   setMarkerClickHandler((entry) => openTruckPopup(entry, startFollow));
-  document.getElementById('btn-unfollow').addEventListener('click', stopFollow);
+  $('btn-unfollow').addEventListener('click', stopFollow);
+
+  // Panneau Couches (plié/déplié)
+  $('btn-layers').addEventListener('click', () => {
+    $('layers-control').classList.toggle('open');
+  });
+  // déplié par défaut sur desktop
+  if (window.innerWidth > 768) $('layers-control').classList.add('open');
 
   // Toggles couches
-  document.getElementById('toggle-traffic').addEventListener('change', (e) => {
+  $('toggle-traffic').addEventListener('change', (e) => {
     if (!setTrafficVisible(e.target.checked)) e.target.checked = false;
   });
-  document.getElementById('toggle-weather').addEventListener('change', (e) => {
+  $('toggle-satellite').addEventListener('change', (e) => {
+    setSatelliteVisible(e.target.checked);
+  });
+  $('toggle-weather').addEventListener('change', (e) => {
     setRainVisible(e.target.checked);
   });
-  document.getElementById('toggle-buildings').addEventListener('change', (e) => {
+  $('toggle-buildings').addEventListener('change', (e) => {
     if (map.getLayer('buildings-3d')) {
       map.setLayoutProperty('buildings-3d', 'visibility', e.target.checked ? 'visible' : 'none');
     }
   });
-  document.getElementById('toggle-geofences').addEventListener('change', (e) => {
+  $('toggle-geofences').addEventListener('change', (e) => {
     setGeofencesVisible(e.target.checked);
   });
-  document.getElementById('toggle-trajectories').addEventListener('change', (e) => {
+  $('toggle-trajectories').addEventListener('change', (e) => {
     setTrajectoriesVisible(e.target.checked);
   });
-  document.getElementById('toggle-landmarks').addEventListener('change', (e) => {
+  $('toggle-landmarks').addEventListener('change', (e) => {
     setLandmarksVisible(e.target.checked);
   });
+  $('toggle-cameras').addEventListener('change', (e) => {
+    setCamerasVisible(e.target.checked);
+  });
 
-  // Bascule fond sombre ↔ clair : setStyle() détruit les couches
-  // custom — on les reconstruit puis on ré-applique l'état des toggles
-  document.getElementById('btn-style').addEventListener('click', () => {
-    switchBaseStyle((newMode) => {
-      drawGeofences();
-      drawLandmarks(newMode);
-      users.forEach((u) => ensureTrajectoryLayer(u));
-      fleet.forEach((entry) => redrawTrajectory(entry.user.id));
+  // Bascule fond sombre ↔ clair
+  $('btn-style').addEventListener('click', () => {
+    switchBaseStyle(() => {
       resetTraffic();
       resetRain();
-      if (document.getElementById('toggle-traffic').checked) setTrafficVisible(true);
-      if (document.getElementById('toggle-weather').checked) setRainVisible(true);
-      if (!document.getElementById('toggle-geofences').checked) setGeofencesVisible(false);
-      if (!document.getElementById('toggle-trajectories').checked) setTrajectoriesVisible(false);
-      if (!document.getElementById('toggle-landmarks').checked) setLandmarksVisible(false);
-      if (document.getElementById('toggle-buildings') && !document.getElementById('toggle-buildings').checked
-          && map.getLayer('buildings-3d')) {
-        map.setLayoutProperty('buildings-3d', 'visibility', 'none');
-      }
+      drawAllOverlays(users);
     });
   });
 
-  // 2D/3D + mesure
-  const btn23d = document.getElementById('btn-23d');
+  // 2D/3D + mesure (carte démarre en pitch 45 → bouton propose 2D)
+  const btn23d = $('btn-23d');
   btn23d.addEventListener('click', () => toggle3D(btn23d));
-  document.getElementById('btn-measure').addEventListener('click', toggleMeasure);
+  $('btn-measure').addEventListener('click', toggleMeasure);
   map.on('click', (e) => handleMeasureClick(e));
 
+  // Gestion chauffeurs
+  setupDriverModal(() => setTimeout(() => window.location.reload(), 800));
+  setDriverDeleteHandler(async (user) => {
+    if (!window.confirm(`Retirer ${user.full_name} de la flotte ?\n(L'historique de ses trajets est conservé)`)) return;
+    try {
+      await removeDriver(user.id, user.full_name);
+      setTimeout(() => window.location.reload(), 800);
+    } catch (e) {
+      toast(`Suppression impossible : ${e.message}`, true);
+    }
+  });
+
   // Historique
-  const driverSel = document.getElementById('history-driver');
+  const driverSel = $('history-driver');
   driverSel.innerHTML = users
     .map((u) => `<option value="${u.id}">${u.full_name} (${u.vehicle_id || u.user_code})</option>`)
     .join('');
-  const dateInput = document.getElementById('history-date');
+  const dateInput = $('history-date');
   dateInput.value = new Date().toISOString().slice(0, 10);
 
   let historyRows = [];
-  document.getElementById('btn-history').addEventListener('click', async () => {
-    const statsEl = document.getElementById('history-stats');
+  $('btn-history').addEventListener('click', async () => {
+    const statsEl = $('history-stats');
     try {
       historyRows = await loadDayHistory(driverSel.value, dateInput.value);
       if (!historyRows.length) {
@@ -173,7 +218,7 @@ function setupControls(users) {
     }
   });
 
-  document.getElementById('btn-export-csv').addEventListener('click', () => {
+  $('btn-export-csv').addEventListener('click', () => {
     const name = driverSel.options[driverSel.selectedIndex]?.text || 'camion';
     if (!exportCSV(historyRows, `babyroad_${name}_${dateInput.value}.csv`)) {
       toast('Charger d\'abord un historique à exporter');

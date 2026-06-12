@@ -67,10 +67,16 @@ function addBuildings3D() {
       'source-layer': 'building',
       minzoom: 14,
       paint: {
-        'fill-extrusion-color': mode === 'dark' ? '#1E3A5F' : '#CBD5E1',
+        // dégradé par hauteur : les tours ressortent, effet "ville"
+        'fill-extrusion-color': mode === 'dark'
+          ? ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 8],
+              4, '#243B55', 40, '#33597F', 100, '#4678A8']
+          : ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 8],
+              4, '#D7DEE7', 40, '#B9C6D6', 100, '#93A9C4'],
         'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 8],
         'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-        'fill-extrusion-opacity': 0.75,
+        'fill-extrusion-opacity': 0.8,
+        'fill-extrusion-vertical-gradient': true,
       },
     });
   } catch (e) {
@@ -81,6 +87,28 @@ function addBuildings3D() {
 export function toggleLayer(layerId, visible) {
   if (!map.getLayer(layerId)) return;
   map.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+}
+
+// Vue satellite : imagerie aérienne réelle (Esri World Imagery, gratuit).
+// Insérée sous les labels pour garder les noms de rues lisibles.
+export function setSatelliteVisible(visible) {
+  if (!map.getSource('satellite')) {
+    map.addSource('satellite', {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: 'Imagerie © Esri',
+    });
+  }
+  if (!map.getLayer('satellite-layer')) {
+    const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
+    map.addLayer(
+      { id: 'satellite-layer', type: 'raster', source: 'satellite', paint: { 'raster-opacity': 1 } },
+      firstSymbol
+    );
+  }
+  map.setLayoutProperty('satellite-layer', 'visibility', visible ? 'visible' : 'none');
 }
 
 export function toggle3D(btn) {
