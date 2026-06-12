@@ -5,6 +5,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { CONFIG } from './config.js';
 import { GPSKalmanFilter } from './kalman.js';
+import { setupLive } from './live.js';
 
 const supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
 const kalman = new GPSKalmanFilter();
@@ -266,7 +267,11 @@ function setupPOD() {
   pod.inFace.addEventListener('change', () => sendPodPhoto(pod.inFace, 'VISAGE'));
   pod.inDoc.addEventListener('change', () => sendPodPhoto(pod.inDoc, 'DOCUMENT'));
   subscribePodRequests();
-  ui.select.addEventListener('change', subscribePodRequests);
+  setupLive(supabase, ui.select.value);
+  ui.select.addEventListener('change', () => {
+    subscribePodRequests();
+    setupLive(supabase, ui.select.value);
+  });
 }
 
 // Le dispatcher peut demander une photo : bannière + vibration

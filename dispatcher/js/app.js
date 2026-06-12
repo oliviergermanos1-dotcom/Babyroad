@@ -25,10 +25,12 @@ import {
   renderDriverCards, openTruckPopup, startFollow, stopFollow, followTick,
   toggleMeasure, handleMeasureClick, renderAlertsList, startClock,
   setupPanelToggle, setDriverDeleteHandler, setRequestPhotoHandler,
+  setOpenLiveHandler,
 } from './ui.js';
 import { loadDayHistory, drawHistory, clearHistory, computeStats, exportCSV } from './history.js';
 import { removeDriver, setupDriverModal } from './drivers.js';
 import { loadRecentPOD, subscribePOD, requestPhoto } from './pod.js';
+import { openLive } from './live.js';
 import {
   applyAtmosphere, setTerrainEnabled, startGeofencePulse, toggleCinematicTour,
 } from './effects.js';
@@ -195,6 +197,9 @@ function setupControls(users) {
 
   // Demande de photo au chauffeur (popup camion → 📸 Photo)
   setRequestPhotoHandler((userId) => requestPhoto(userId));
+
+  // Vidéo en direct bodycam (popup camion → 🔴 Live)
+  setOpenLiveHandler((userId) => openLive(userId));
 
   // Bascule fond sombre ↔ clair
   $('btn-style').addEventListener('click', () => {

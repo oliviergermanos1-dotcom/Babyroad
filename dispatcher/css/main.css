@@ -201,6 +201,72 @@ html, body {
 .badge-horszone { background: #FEE2E2; color: #991B1B; }
 .badge-offline  { background: #E5E7EB; color: #4B5563; }
 
+.btn-live {
+  background: var(--color-danger);
+  color: var(--color-white);
+  border: none;
+}
+
+/* ── Live vidéo overlay ─────────────────────────────────── */
+.live-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+.live-box {
+  width: 100%;
+  max-width: 760px;
+  background: #0D1B2A;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-pop);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.live-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.live-head .live-dot {
+  display: inline-block;
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  margin-right: 6px;
+  animation: livepulse 1s infinite;
+}
+@keyframes livepulse { 50% { opacity: 0.25; } }
+.live-head button {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.live-box video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  display: block;
+}
+.live-status {
+  padding: 9px 14px;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.8rem;
+}
+
 /* ── Modal ──────────────────────────────────────────────── */
 .modal {
   position: fixed;

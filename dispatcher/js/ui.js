@@ -120,6 +120,7 @@ export function openTruckPopup(entry, onFollow) {
         <button class="btn btn-primary" id="popup-center">🎯 Centrer</button>
         <button class="btn btn-secondary" id="popup-follow">📍 Suivre</button>
         <button class="btn btn-danger" id="popup-photo">📸 Photo</button>
+        <button class="btn btn-live" id="popup-live">🔴 Live</button>
       </div>
     `)
     .addTo(map);
@@ -135,10 +136,16 @@ export function openTruckPopup(entry, onFollow) {
     popup.remove();
     if (onRequestPhoto) onRequestPhoto(entry.user.id);
   });
+  popup.getElement().querySelector('#popup-live').addEventListener('click', () => {
+    popup.remove();
+    if (onOpenLive) onOpenLive(entry.user.id);
+  });
 }
 
 let onRequestPhoto = null;
 export function setRequestPhotoHandler(fn) { onRequestPhoto = fn; }
+let onOpenLive = null;
+export function setOpenLiveHandler(fn) { onOpenLive = fn; }
 
 // ── Follow mode ─────────────────────────────────────────────
 export function startFollow(entry) {
