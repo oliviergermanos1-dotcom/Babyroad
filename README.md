@@ -30,24 +30,23 @@ Dashboard dispatcher (Vercel) — MapLibre GL JS
 
 ## Mise en route (Phase 1 → 5)
 
-### 1. Supabase (~10 min)
-1. Ouvrir le [SQL Editor](https://supabase.com/dashboard/project/siewomjmhnufravrpqem/sql) du projet.
-2. Exécuter `supabase/babyroad_schema.sql` (idempotent — crée 4 tables `babyroad_*`,
-   la vue `babyroad_last_positions`, les RLS, active Realtime, insère 4 conducteurs + 10 geofences).
-3. Personnaliser les noms des conducteurs :
+### 1. Supabase — ✅ DÉJÀ FAIT (12 juin 2026)
+Le schéma `supabase/babyroad_schema.sql` est **appliqué** sur le projet
+`fpntzgrocuiiqjixtbuo` (et non `siewomjmhnufravrpqem` comme prévu au dossier —
+seul projet accessible au moment du setup ; le script reste ré-exécutable sur
+n'importe quel projet si on veut migrer). 4 tables + vue + RLS + Realtime actifs,
+4 conducteurs + 10 geofences insérés.
+
+Personnaliser les noms des conducteurs ([SQL Editor](https://supabase.com/dashboard/project/fpntzgrocuiiqjixtbuo/sql)) :
    ```sql
    UPDATE babyroad_users SET full_name='Koné Mamadou', vehicle_id='CAM-AGL-001' WHERE user_code='DRIVER_01';
    ```
 
-### 2. Clés API (~10 min)
-1. **Supabase anon key** : Dashboard → Settings → API → `anon public`.
-2. **TomTom** (trafic) : compte gratuit sur [developer.tomtom.com](https://developer.tomtom.com) (2 500 req/jour).
+### 2. Clés API
+1. **Supabase anon key** : ✅ déjà renseignée dans les 3 configs (safe côté client, RLS).
+2. **TomTom** (trafic) : compte gratuit sur [developer.tomtom.com](https://developer.tomtom.com)
+   (2 500 req/jour) → coller dans `dispatcher/js/config.js` (`TOMTOM_API_KEY`).
 3. **MapTiler** (optionnel) : sans clé, la carte utilise le fallback OpenFreeMap (gratuit, sans quota).
-
-Renseigner les clés dans :
-- `dispatcher/js/config.js` (SUPABASE_ANON_KEY, TOMTOM_API_KEY, MAPTILER_KEY)
-- `tracker/config.js` (SUPABASE_ANON_KEY)
-- `android-app/src/config.js` (copier `config.example.js`, gitignoré)
 
 > La clé **anon** est safe côté client (protégée par RLS). La clé **service** ne doit
 > JAMAIS apparaître dans le code client (contrainte #5).

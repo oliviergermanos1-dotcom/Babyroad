@@ -1,8 +1,9 @@
 -- ============================================================
 -- BABYROAD — Fleet Tracking System
 -- Schéma Supabase complet — Phase 1
--- Projet cible : siewomjmhnufravrpqem (partagé avec FripGestion Pro)
--- Toutes les tables sont préfixées babyroad_ (contrainte #6)
+-- ✅ Appliqué le 2026-06-12 sur le projet fpntzgrocuiiqjixtbuo.
+-- Toutes les tables sont préfixées babyroad_ (contrainte #6) —
+-- le script reste exécutable tel quel sur tout autre projet Supabase.
 -- Script IDEMPOTENT : ré-exécutable sans danger.
 -- ============================================================
 
