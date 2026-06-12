@@ -73,7 +73,17 @@ export function renderDriverCards(fleet) {
       <button class="btn-del-driver" title="Retirer ce chauffeur de la flotte">🗑</button>
     `;
     card.addEventListener('click', () => {
-      if (p) map.flyTo({ center: [p.lng, p.lat], zoom: 15 });
+      // vol cinématique vers le camion, caméra dans son axe
+      if (p) {
+        map.flyTo({
+          center: [p.lng, p.lat],
+          zoom: 16,
+          pitch: 55,
+          bearing: p.heading || 0,
+          speed: 1.3,
+          curve: 1.5,
+        });
+      }
     });
     card.querySelector('.btn-del-driver').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -136,7 +146,14 @@ export function followTick(fleet) {
   if (!followUserId) return;
   const entry = fleet.get(followUserId);
   if (entry?.position) {
-    map.easeTo({ center: [entry.position.lng, entry.position.lat], duration: 800 });
+    // chase-cam : caméra derrière le camion, orientée selon son cap
+    map.easeTo({
+      center: [entry.position.lng, entry.position.lat],
+      bearing: entry.position.heading || 0,
+      pitch: Math.max(map.getPitch(), 50),
+      zoom: Math.max(map.getZoom(), 15),
+      duration: 850,
+    });
   }
 }
 

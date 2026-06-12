@@ -13,10 +13,22 @@ export function pushPoint(userId, lng, lat) {
 
 export function ensureTrajectoryLayer(user) {
   const srcId = `traj-src-${user.id}`;
-  if (map.getSource(srcId)) return;
-  map.addSource(srcId, {
-    type: 'geojson',
-    data: emptyLine(),
+  if (!map.getSource(srcId)) {
+    map.addSource(srcId, { type: 'geojson', data: emptyLine() });
+  }
+  if (map.getLayer(`traj-${user.id}`)) return;
+  // halo lumineux sous la trace (effet néon)
+  map.addLayer({
+    id: `traj-glow-${user.id}`,
+    type: 'line',
+    source: srcId,
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': user.marker_color || '#1B6B3A',
+      'line-width': 11,
+      'line-blur': 6,
+      'line-opacity': 0.35,
+    },
   });
   map.addLayer({
     id: `traj-${user.id}`,
@@ -26,7 +38,7 @@ export function ensureTrajectoryLayer(user) {
     paint: {
       'line-color': user.marker_color || '#1B6B3A',
       'line-width': 4,
-      'line-opacity': 0.7,
+      'line-opacity': 0.85,
     },
   });
 }
@@ -43,10 +55,11 @@ export function redrawTrajectory(userId) {
 
 export function setTrajectoriesVisible(visible) {
   traces.forEach((_, userId) => {
-    const layer = `traj-${userId}`;
-    if (map.getLayer(layer)) {
-      map.setLayoutProperty(layer, 'visibility', visible ? 'visible' : 'none');
-    }
+    [`traj-${userId}`, `traj-glow-${userId}`].forEach((layer) => {
+      if (map.getLayer(layer)) {
+        map.setLayoutProperty(layer, 'visibility', visible ? 'visible' : 'none');
+      }
+    });
   });
 }
 

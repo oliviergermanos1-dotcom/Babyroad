@@ -173,6 +173,7 @@ export function drawLandmarks(mode = 'dark') {
         'fill-extrusion-height': ['get', 'height'],
         'fill-extrusion-base': ['get', 'base'],
         'fill-extrusion-opacity': 0.92,
+        'fill-extrusion-vertical-gradient': true,
       },
     });
     map.addLayer({

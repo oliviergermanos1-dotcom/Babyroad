@@ -24,6 +24,12 @@
   background: rgba(27, 107, 58, 0.35);
   animation: pulse 1.6s ease-out infinite;
 }
+.truck-marker.actif .truck-icon {
+  filter: drop-shadow(0 0 7px rgba(46, 200, 110, 0.85));
+}
+.truck-marker.horszone .truck-icon {
+  filter: drop-shadow(0 0 7px rgba(220, 38, 38, 0.9));
+}
 .truck-marker.arrete .halo { background: rgba(247, 148, 29, 0.35); }
 .truck-marker.horszone .halo {
   background: rgba(220, 38, 38, 0.4);
@@ -134,7 +140,8 @@
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
 }
 .layers-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 5px;
   margin-top: 4px;
   padding-top: 8px;

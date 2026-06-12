@@ -28,6 +28,9 @@ import {
 } from './ui.js';
 import { loadDayHistory, drawHistory, clearHistory, computeStats, exportCSV } from './history.js';
 import { removeDriver, setupDriverModal } from './drivers.js';
+import {
+  applyAtmosphere, setTerrainEnabled, startGeofencePulse, toggleCinematicTour,
+} from './effects.js';
 
 const $ = (id) => document.getElementById(id);
 const checked = (id) => $(id).checked;
@@ -96,6 +99,7 @@ async function main() {
     startPing();
     loadWeatherPanel();
     setAlertRenderer(renderAlertsList);
+    startGeofencePulse();
 
     setupControls(users);
     hideSplash();
@@ -105,12 +109,14 @@ async function main() {
 // Dessine toutes les couches custom + ré-applique l'état des toggles.
 // Utilisé au chargement ET après un changement de fond (setStyle détruit tout).
 function drawAllOverlays(users) {
+  applyAtmosphere(mapMode());
   drawGeofences();
   drawLandmarks(mapMode());
   drawCameras();
   users.forEach((u) => ensureTrajectoryLayer(u));
   fleet.forEach((entry) => redrawTrajectory(entry.user.id));
 
+  if (checked('toggle-terrain')) setTerrainEnabled(true);
   if (checked('toggle-satellite')) setSatelliteVisible(true);
   if (checked('toggle-traffic')) setTrafficVisible(true);
   if (checked('toggle-weather')) setRainVisible(true);
@@ -162,6 +168,15 @@ function setupControls(users) {
   $('toggle-cameras').addEventListener('change', (e) => {
     setCamerasVisible(e.target.checked);
   });
+  $('toggle-terrain').addEventListener('change', (e) => {
+    setTerrainEnabled(e.target.checked);
+    if (e.target.checked && map.getPitch() < 30) {
+      map.easeTo({ pitch: 55, duration: 700 }); // le relief se voit en 3D
+    }
+  });
+
+  // Tour 3D cinématique (orbite au-dessus du Plateau)
+  $('btn-tour').addEventListener('click', () => toggleCinematicTour($('btn-tour')));
 
   // Bascule fond sombre ↔ clair
   $('btn-style').addEventListener('click', () => {
