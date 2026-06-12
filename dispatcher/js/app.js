@@ -18,7 +18,7 @@ import {
 import {
   onPositionAlerts, startSignalWatch, setAlertRenderer, outOfZoneIds, toast,
 } from './alerts.js';
-import { setTrafficVisible, resetTraffic } from './traffic.js';
+import { setTrafficVisible, resetTraffic, recordFleetSegment, drawFleetTraffic } from './traffic.js';
 import { loadWeatherPanel, setRainVisible, resetRain } from './weather.js';
 import { startPing } from './benchmark.js';
 import {
@@ -77,12 +77,13 @@ async function main() {
     });
 
     // Realtime : chaque INSERT de position
-    subscribeRealtime((entry) => {
+    subscribeRealtime((entry, prev) => {
       const p = entry.position;
       pushPoint(entry.user.id, p.lng, p.lat);
       redrawTrajectory(entry.user.id);
       upsertMarker(entry, outOfZoneIds);
       onPositionAlerts(entry);
+      recordFleetSegment(prev, p);
       followTick(fleet);
     });
 
@@ -116,6 +117,7 @@ function drawAllOverlays(users) {
   users.forEach((u) => ensureTrajectoryLayer(u));
   fleet.forEach((entry) => redrawTrajectory(entry.user.id));
 
+  drawFleetTraffic();
   if (checked('toggle-terrain')) setTerrainEnabled(true);
   if (checked('toggle-satellite')) setSatelliteVisible(true);
   if (checked('toggle-traffic')) setTrafficVisible(true);

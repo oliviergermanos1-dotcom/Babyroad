@@ -8,15 +8,15 @@ import { map } from './map.js';
 
 const CAMERAS = [
   // ── Radars vitesse / feux (vidéo-verbalisation) ──
-  { t: 'RADAR', name: 'Bd VGE — Carrefour Solibra',        lat: 5.3005, lng: -4.0015, axe: 'Boulevard VGE', limite: '70 km/h' },
-  { t: 'RADAR', name: 'Bd VGE — Marcory Anoumabo',         lat: 5.2975, lng: -3.9880, axe: 'Boulevard VGE', limite: '70 km/h' },
-  { t: 'RADAR', name: 'Bd VGE — Zone 4 / Bietry',          lat: 5.2935, lng: -3.9760, axe: 'Boulevard VGE', limite: '70 km/h' },
-  { t: 'RADAR', name: 'Bd VGE — Aéroport FHB',             lat: 5.2640, lng: -3.9410, axe: 'Boulevard VGE', limite: '90 km/h' },
+  { t: 'RADAR', name: 'Bd VGE — Carrefour Solibra',        lat: 5.3040, lng: -3.9985, axe: 'Boulevard VGE', limite: '70 km/h' },
+  { t: 'RADAR', name: 'Bd VGE — Marcory',                  lat: 5.3000, lng: -3.9860, axe: 'Boulevard VGE', limite: '70 km/h' },
+  { t: 'RADAR', name: 'Bd VGE — Zone 4 / Bietry',          lat: 5.2950, lng: -3.9750, axe: 'Boulevard VGE', limite: '70 km/h' },
+  { t: 'RADAR', name: 'Bd VGE — rond-point Aéroport',      lat: 5.2590, lng: -3.9350, axe: 'Boulevard VGE', limite: '90 km/h' },
   { t: 'RADAR', name: 'Autoroute du Nord — sortie Abidjan', lat: 5.4123, lng: -4.0234, axe: 'Autoroute A1', limite: '110 km/h' },
   { t: 'RADAR', name: 'Voie express Adjamé–Yopougon',      lat: 5.3620, lng: -4.0480, axe: 'Voie express', limite: '90 km/h' },
-  { t: 'RADAR', name: 'Autoroute de Bassam — Port-Bouët',  lat: 5.2560, lng: -3.9080, axe: 'Autoroute Bassam', limite: '110 km/h' },
+  { t: 'RADAR', name: 'Autoroute de Bassam — Port-Bouët',  lat: 5.2500, lng: -3.9230, axe: 'Autoroute Bassam (côtière)', limite: '110 km/h' },
   { t: 'RADAR', name: 'Bd Mitterrand — Riviera 2',         lat: 5.3560, lng: -3.9620, axe: 'Bd Mitterrand', limite: '80 km/h' },
-  { t: 'RADAR', name: 'Pont HKB — péage',                  lat: 5.2985, lng: -3.9785, axe: 'Pont HKB', limite: '70 km/h' },
+  { t: 'RADAR', name: 'Pont HKB — péage Marcory',          lat: 5.3120, lng: -3.9800, axe: 'Pont HKB', limite: '70 km/h' },
   { t: 'RADAR', name: 'Bd de Marseille — Zone 4',          lat: 5.2850, lng: -3.9850, axe: 'Bd de Marseille', limite: '60 km/h' },
   // ── Caméras de surveillance (carrefours stratégiques) ──
   { t: 'CAM', name: 'Carrefour de l\'Indénié',             lat: 5.3290, lng: -4.0125, axe: 'Plateau / Adjamé' },
@@ -57,14 +57,16 @@ export function drawCameras() {
   }
   if (map.getLayer('cameras-dot')) return;
 
+  // petit badge blanc cerclé de la couleur du type, icône par-dessus
+  // (même symbole que dans la légende)
   map.addLayer({
     id: 'cameras-dot',
     type: 'circle',
     source: 'cameras',
     paint: {
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 14, 9, 17, 13],
-      'circle-color': ['get', 'color'],
-      'circle-opacity': 0.25,
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 6, 14, 9, 17, 11],
+      'circle-color': '#FFFFFF',
+      'circle-opacity': 0.95,
       'circle-stroke-width': 2,
       'circle-stroke-color': ['get', 'color'],
     },
@@ -73,10 +75,9 @@ export function drawCameras() {
     id: 'cameras-icon',
     type: 'symbol',
     source: 'cameras',
-    minzoom: 11,
     layout: {
       'text-field': ['get', 'icon'],
-      'text-size': ['interpolate', ['linear'], ['zoom'], 11, 12, 15, 20],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 10, 8, 14, 11, 17, 14],
       'text-allow-overlap': true,
     },
   });

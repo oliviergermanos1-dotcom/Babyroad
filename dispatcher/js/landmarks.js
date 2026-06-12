@@ -55,69 +55,69 @@ const LANDMARKS = [
   {
     name: 'Pont Charles De Gaulle',
     desc: 'Pont historique (1967) reliant le Plateau à Treichville au-dessus de la lagune Ébrié.',
-    icon: '🌉', color: '#9AA7B5', labelAt: [5.3130, -4.0185],
-    parts: [{ poly: bridge(5.3185, -4.0202, 5.3075, -4.0168, 22), height: 10 }],
+    icon: '🌉', color: '#9AA7B5', labelAt: [5.3133, -4.0113],
+    parts: [{ poly: bridge(5.3168, -4.0125, 5.3098, -4.0102, 22), height: 10 }],
   },
   {
     name: 'Pont Félix Houphouët-Boigny',
     desc: 'Le plus ancien pont d\'Abidjan (1957), Plateau ↔ Treichville. Rail + route.',
-    icon: '🌉', color: '#8E9BA9', labelAt: [5.3135, -4.0263],
-    parts: [{ poly: bridge(5.3180, -4.0272, 5.3090, -4.0252, 18), height: 9 }],
+    icon: '🌉', color: '#8E9BA9', labelAt: [5.3124, -4.0178],
+    parts: [{ poly: bridge(5.3155, -4.0186, 5.3092, -4.0170, 18), height: 9 }],
   },
   {
     name: 'Pont Henri Konan Bédié',
     desc: '3ᵉ pont (2014), à péage — Riviera/Cocody ↔ Marcory. Axe majeur de la logistique Est.',
-    icon: '🌉', color: '#F7941D', labelAt: [5.3010, -3.9775],
-    parts: [{ poly: bridge(5.3095, -3.9745, 5.2930, -3.9800, 26), height: 12 }],
+    icon: '🌉', color: '#F7941D', labelAt: [5.3220, -3.9806], // centre vérifié 5.32201,-3.98061
+    parts: [{ poly: bridge(5.3295, -3.9815, 5.3145, -3.9797, 26), height: 12 }],
   },
   {
-    name: '4ᵉ Pont (Yopougon–Plateau)',
-    desc: 'Pont récent (2023) — désenclave Yopougon vers le Plateau et Adjamé.',
-    icon: '🌉', color: '#E8B84B', labelAt: [5.3456, -4.0567],
-    parts: [{ poly: bridge(5.3520, -4.0625, 5.3395, -4.0510, 24), height: 11 }],
+    name: '4ᵉ Pont (Yopougon–Adjamé)',
+    desc: 'Pont récent (2023) sur la baie du Banco — désenclave Yopougon vers Adjamé/Plateau.',
+    icon: '🌉', color: '#E8B84B', labelAt: [5.3362, -4.0475],
+    parts: [{ poly: bridge(5.3380, -4.0545, 5.3345, -4.0405, 24), height: 11 }],
   },
   {
     name: 'La Pyramide',
     desc: 'Immeuble brutaliste emblématique du Plateau (1973, arch. Rinaldo Olivieri).',
-    icon: '🔺', color: '#C8B89A', labelAt: [5.3235, -4.0165],
+    icon: '🔺', color: '#C8B89A', labelAt: [5.3196, -4.0157],
     parts: [
-      { poly: rect(5.3235, -4.0165, 48, 48, 15), height: 30 },
-      { poly: rect(5.3235, -4.0165, 34, 34, 15), height: 52, base: 30 },
-      { poly: rect(5.3235, -4.0165, 18, 18, 15), height: 68, base: 52 },
+      { poly: rect(5.3196, -4.0157, 48, 48, 15), height: 30 },
+      { poly: rect(5.3196, -4.0157, 34, 34, 15), height: 52, base: 30 },
+      { poly: rect(5.3196, -4.0157, 18, 18, 15), height: 68, base: 52 },
     ],
   },
   {
     name: 'Tour D — Cité Administrative',
     desc: 'La plus haute tour du Plateau (~110 m), siège de ministères.',
-    icon: '🏢', color: '#7E8C9E', labelAt: [5.3300, -4.0205],
-    parts: [{ poly: rect(5.3300, -4.0205, 34, 34, 0), height: 110 }],
+    icon: '🏢', color: '#7E8C9E', labelAt: [5.3262, -4.0215],
+    parts: [{ poly: rect(5.3262, -4.0215, 34, 34, 0), height: 110 }],
   },
   {
     name: 'Cathédrale Saint-Paul',
     desc: 'Cathédrale moderne (1985) : pylône en forme de croix retenant la nef par des haubans.',
-    icon: '⛪', color: '#E7E2D8', labelAt: [5.3330, -4.0225],
+    icon: '⛪', color: '#E7E2D8', labelAt: [5.3328, -4.0200], // coordonnées Wikipédia
     parts: [
-      { poly: rect(5.3330, -4.0225, 65, 28, 35), height: 22 },                 // nef
-      { poly: rect(5.3327, -4.0231, 10, 10, 35), height: 70, color: '#D8D2C4' }, // pylône-croix
+      { poly: rect(5.3328, -4.0200, 65, 28, 35), height: 22 },                 // nef
+      { poly: rect(5.3325, -4.0206, 10, 10, 35), height: 70, color: '#D8D2C4' }, // pylône-croix
     ],
   },
   {
     name: 'Hôtel Ivoire (Sofitel)',
     desc: 'Tour hôtelière iconique de Cocody (1963-1970), vue panoramique sur la lagune.',
-    icon: '🏨', color: '#B7AE9C', labelAt: [5.3320, -4.0020],
-    parts: [{ poly: rect(5.3320, -4.0020, 52, 20, 80), height: 85 }],
+    icon: '🏨', color: '#B7AE9C', labelAt: [5.3245, -4.0000],
+    parts: [{ poly: rect(5.3245, -4.0000, 52, 20, 80), height: 85 }],
   },
   {
     name: 'Tour Postel 2001',
     desc: 'Tour de La Poste (Plateau), silhouette caractéristique au bord de la lagune.',
-    icon: '🏢', color: '#9FB4C7', labelAt: [5.3215, -4.0282],
-    parts: [{ poly: rect(5.3215, -4.0282, 30, 30, 45), height: 90 }],
+    icon: '🏢', color: '#9FB4C7', labelAt: [5.3180, -4.0250],
+    parts: [{ poly: rect(5.3180, -4.0250, 30, 30, 45), height: 90 }],
   },
   {
     name: 'Stade Olympique Alassane Ouattara — Ébimpé',
-    desc: 'Stade de 60 000 places (CAN 2023), au bord de la rocade Y4.',
-    icon: '🏟', color: '#D9D9D9', labelAt: [5.4234, -4.0123],
-    parts: [{ poly: circle(5.4234, -4.0123, 130, 80), height: 38 }],
+    desc: 'Stade de 60 000 places (CAN 2023), à Ébimpé/Anyama au nord-ouest.',
+    icon: '🏟', color: '#D9D9D9', labelAt: [5.4786, -4.0869],
+    parts: [{ poly: circle(5.4786, -4.0869, 130, 80), height: 38 }],
   },
 ];
 

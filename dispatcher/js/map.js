@@ -67,15 +67,18 @@ function addBuildings3D() {
       'source-layer': 'building',
       minzoom: 14,
       paint: {
-        // dégradé par hauteur : les tours ressortent, effet "ville"
+        // façades variées : teinte choisie par immeuble (hash de son id OSM)
+        // → plus de cubes uniformes, effet quartier réaliste
         'fill-extrusion-color': mode === 'dark'
-          ? ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 8],
-              4, '#243B55', 40, '#33597F', 100, '#4678A8']
-          : ['interpolate', ['linear'], ['coalesce', ['get', 'render_height'], 8],
-              4, '#D7DEE7', 40, '#B9C6D6', 100, '#93A9C4'],
+          ? ['match', ['%', ['to-number', ['id']], 6],
+              0, '#2C4A68', 1, '#33597F', 2, '#3D6489',
+              3, '#28557A', 4, '#46708F', 5, '#395D74', '#33597F']
+          : ['match', ['%', ['to-number', ['id']], 6],
+              0, '#E3D9C8', 1, '#CBD2DA', 2, '#DCC9B4',
+              3, '#C8D2DC', 4, '#E8E0D0', 5, '#D2C7BC', '#D7DEE7'],
         'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 8],
         'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-        'fill-extrusion-opacity': 0.8,
+        'fill-extrusion-opacity': 0.88,
         'fill-extrusion-vertical-gradient': true,
       },
     });
