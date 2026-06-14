@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Env / secrets
+.env
+**/.env
+backend/firebase-admin.json
+mobile/google-services.json
+mobile/GoogleService-Info.plist
+
+# Builds
+dist/
+build/
+mobile/android/app/build/
+mobile/android/build/
+mobile/ios/build/
+*.apk
+*.aab
+*.keystore
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/

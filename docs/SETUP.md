@@ -1,0 +1,99 @@
+# BabyPhone — Setup Guide
+
+BabyPhone is a family audio/video monitor. A **parent** device listens to a
+**caregiver** device (e.g. a phone left near the baby). Audio and optional video
+are relayed in real time through a WebSocket server.
+
+```
+caregiver phone  ──mic/cam──►  WebSocket server  ──relay──►  parent phone
+   (foreground service)          (backend/)                   (Stream screen)
+```
+
+## Prerequisites
+
+- Node.js ≥ 18
+- A Firebase project (Auth + Firestore)
+- React Native dev environment (Android Studio / Xcode) — see
+  https://reactnative.dev/docs/environment-setup
+
+## 1. Firebase
+
+1. Create a project at https://console.firebase.google.com
+2. **Auth** → enable *Phone* sign-in.
+3. **Firestore** → create a `users` collection. Each user document:
+   ```json
+   {
+     "name": "Grace",
+     "phone": "+22500000000",
+     "role": "parent",          // or "caregiver"
+     "contacts": ["<caregiverUid>", "..."]   // parents only
+   }
+   ```
+4. **Service account** (backend): Project settings → Service accounts →
+   *Generate new private key*. Save it as `backend/firebase-admin.json`
+   (gitignored) **or** copy the values into `backend/.env`
+   (`FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY`).
+5. **Mobile config**: copy your web app config into
+   `mobile/services/firebase.ts`.
+
+> Phone auth in React Native: the bare `firebase` JS SDK needs a reCAPTCHA
+> verifier. For production, use `@react-native-firebase/auth`, which handles
+> SMS/OTP natively. `AuthScreen.tsx` is structured so you can swap the import
+> with minimal changes.
+
+## 2. Backend
+
+```bash
+cd backend
+cp .env.example .env          # then fill in Firebase creds (or add firebase-admin.json)
+npm install
+npm run check                 # syntax check
+npm run dev                   # starts on http://localhost:5000
+```
+
+Health check: `curl http://localhost:5000/health`
+
+## 3. Mobile
+
+```bash
+cd mobile
+npm install
+# point the app at your backend:
+#   - emulator: defaults work (10.0.2.2 on Android, localhost on iOS)
+#   - device/prod: set EXPO_PUBLIC_WS_URL or edit services/config.ts
+npm run android   # or: npm run ios
+```
+
+## 4. Caregiver background audio (Android)
+
+`BackgroundMicService.kt` is a foreground service that records the mic and is
+meant to emit PCM chunks to JS. Wiring left for you:
+
+1. Register the service in your `MainApplication` package list (or via a custom
+   native module) and start it from JS when a stream begins.
+2. In `sendAudioChunk(...)`, base64-encode the buffer and emit it to JS through
+   `RCTDeviceEventEmitter` (event `"AudioChunk"`).
+3. In JS, on that event call `sendMessage({ type: 'AUDIO_CHUNK', streamId, audio })`.
+
+Android requires the visible notification — it is part of the privacy contract.
+
+## 5. Real-time quality (upgrade path)
+
+This starter relays **base64 audio chunks / JPEG frames over WebSocket**, which
+is simple and works for low latency on a LAN. For production-grade, low-latency,
+NAT-traversing media, migrate the media path to **WebRTC**
+(`react-native-webrtc`) and keep this WebSocket server purely for signaling
+(AUTH, contacts, START/STOP). The message shapes are already signaling-friendly.
+
+## 6. Deploy
+
+- **Backend**: Railway / Render. Set the `FIREBASE_*` env vars, expose the port.
+  Use the `wss://` URL in the app (`EXPO_PUBLIC_WS_URL`).
+- **Mobile**: `cd android && ./gradlew bundleRelease` → upload the AAB to Google
+  Play Console.
+
+## Privacy & consent
+
+BabyPhone streams a live microphone (and optionally camera). Only deploy it for
+people who **know and consent** to being monitored (your own household / baby
+monitor use). The persistent Android notification must remain visible.
