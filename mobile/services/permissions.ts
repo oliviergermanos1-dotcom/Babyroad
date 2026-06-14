@@ -28,3 +28,17 @@ export async function requestStreamingPermissions(
     return false;
   }
 }
+
+/** Request only the camera permission (video stream, no mic needed). */
+export async function requestCameraPermission(): Promise<boolean> {
+  if (Platform.OS !== 'android') return true;
+  try {
+    const res = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA
+    );
+    return res === PermissionsAndroid.RESULTS.GRANTED;
+  } catch (e) {
+    console.warn('[permissions] camera request failed', e);
+    return false;
+  }
+}

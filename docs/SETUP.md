@@ -117,6 +117,29 @@ Tuning notes:
   encoding on the caregiver and decoding before `playChunk`, or move to WebRTC
   (below), which handles codecs, jitter buffering and NAT traversal for you.
 
+## 4b. Caregiver camera (Android) — implemented
+
+```
+CameraModule.kt           Camera2 + JPEG ImageReader, ~6 fps, emits "VideoFrame"
+                          (base64 JPEG). Registered via MicPackage.
+services/cameraBridge.ts  startCamera / stopCamera / onVideoFrame
+useCaregiverStream.ts     on START_VIDEO_STREAM → camera permission → startCamera
+                          → forwards VIDEO_FRAME { streamId, frame }
+screens/StreamViewer      (parent) draws the latest received JPEG frame
+```
+
+Flow mirrors audio: parent taps *📹 See Camera* → server forwards
+`START_VIDEO_STREAM` → caregiver streams JPEG frames → parent's `StreamViewer`
+renders them. Audio and video are independent streams and can run together.
+
+Notes:
+- Camera capture runs while `CaregiverScreen` is foreground (Android blocks
+  background camera). For screen-off monitoring, audio keeps working via the
+  foreground service; video needs the app visible.
+- ~6 fps / 480×640 JPEG is a deliberate bandwidth/battery trade-off. Bump
+  `minFrameIntervalMs` / resolution in `CameraModule.kt` if you need more, or
+  switch to a WebRTC video track for smooth, adaptive streaming.
+
 ## 5. Real-time quality (upgrade path)
 
 This starter relays **base64 audio chunks / JPEG frames over WebSocket**, which

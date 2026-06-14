@@ -18,7 +18,8 @@ class MicPackage : ReactPackage {
     ): List<NativeModule> =
         listOf(
             MicModule(reactContext),
-            AudioPlayerModule(reactContext)
+            AudioPlayerModule(reactContext),
+            CameraModule(reactContext)
         )
 
     override fun createViewManagers(

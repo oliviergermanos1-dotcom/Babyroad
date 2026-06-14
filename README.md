@@ -43,8 +43,14 @@ foreground-service notification is required and must stay visible.
 
 ## Status
 
-Auth, contact list, online presence, role-based routing (parent/caregiver),
-and audio/video stream signaling are wired end to end. The **native
-mic→WebSocket bridge is implemented** (Kotlin service + native module + JS
-glue + caregiver screen). Parent-side PCM playback and the optional WebRTC
-media path are documented in `docs/SETUP.md`.
+End to end: auth, contacts, online presence, role-based routing
+(parent/caregiver), and **real-time audio and video**:
+
+- **Audio** — caregiver mic (foreground service) → WebSocket → parent
+  `AudioTrack` playback.
+- **Video** — caregiver camera (Camera2, ~6 fps JPEG) → WebSocket → parent
+  frame viewer.
+
+Native modules (`MicModule`, `AudioPlayerModule`, `CameraModule`) + JS glue are
+all in place. The optional WebRTC upgrade path is documented in
+`docs/SETUP.md`.

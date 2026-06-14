@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { startMicCapture, stopMicCapture, onAudioChunk } from './micBridge';
-import { requestStreamingPermissions } from './permissions';
+import { startCamera, stopCamera, onVideoFrame } from './cameraBridge';
+import {
+  requestStreamingPermissions,
+  requestCameraPermission,
+} from './permissions';
 import type { WebSocketMessage } from './websocket';
 
 interface Args {
@@ -10,65 +14,102 @@ interface Args {
 }
 
 /**
- * Caregiver-side glue: when the parent starts listening, the server forwards a
- * START_AUDIO_STREAM frame to this device. We then:
- *   1. ask for mic permission,
- *   2. start the foreground capture service,
- *   3. forward each base64 PCM chunk back as AUDIO_CHUNK { streamId, audio }.
- * STOP_STREAM (or unmount) tears the capture down.
+ * Caregiver-side glue. When the parent starts listening/watching, the server
+ * forwards START_AUDIO_STREAM / START_VIDEO_STREAM to this device. We then:
+ *   - ask for the relevant permission,
+ *   - start native capture (mic foreground service / camera),
+ *   - forward AUDIO_CHUNK / VIDEO_FRAME frames tagged with their streamId.
+ * STOP_STREAM (matched by streamId) or unmount tears the matching capture down.
+ * Audio and video are independent — either can run alone or both together.
  */
 export function useCaregiverStream({
   subscribe,
   sendMessage,
   onActiveChange,
 }: Args) {
-  const streamIdRef = useRef<string | null>(null);
-  const chunkUnsubRef = useRef<(() => void) | null>(null);
+  const audioIdRef = useRef<string | null>(null);
+  const videoIdRef = useRef<string | null>(null);
+  const audioUnsubRef = useRef<(() => void) | null>(null);
+  const videoUnsubRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const stop = async () => {
-      if (!streamIdRef.current) return;
-      streamIdRef.current = null;
-      chunkUnsubRef.current?.();
-      chunkUnsubRef.current = null;
+    const notify = () =>
+      onActiveChange?.(!!audioIdRef.current || !!videoIdRef.current);
+
+    const stopAudio = async () => {
+      if (!audioIdRef.current) return;
+      audioIdRef.current = null;
+      audioUnsubRef.current?.();
+      audioUnsubRef.current = null;
       await stopMicCapture();
-      onActiveChange?.(false);
+      notify();
+    };
+
+    const stopVideo = async () => {
+      if (!videoIdRef.current) return;
+      videoIdRef.current = null;
+      videoUnsubRef.current?.();
+      videoUnsubRef.current = null;
+      await stopCamera();
+      notify();
     };
 
     const unsub = subscribe(async (msg) => {
-      if (msg.type === 'START_AUDIO_STREAM') {
-        const granted = await requestStreamingPermissions(false);
-        if (!granted) {
-          sendMessage({
-            type: 'STREAM_ERROR',
-            streamId: msg.streamId,
-            message: 'Microphone permission denied',
+      switch (msg.type) {
+        case 'START_AUDIO_STREAM': {
+          const granted = await requestStreamingPermissions(false);
+          if (!granted) {
+            sendMessage({
+              type: 'STREAM_ERROR',
+              streamId: msg.streamId,
+              message: 'Microphone permission denied',
+            });
+            return;
+          }
+          audioIdRef.current = msg.streamId;
+          audioUnsubRef.current = onAudioChunk((audio) => {
+            if (audioIdRef.current) {
+              sendMessage({ type: 'AUDIO_CHUNK', streamId: audioIdRef.current, audio });
+            }
           });
-          return;
+          await startMicCapture();
+          notify();
+          break;
         }
 
-        streamIdRef.current = msg.streamId;
-        // Forward every captured chunk to the parent.
-        chunkUnsubRef.current = onAudioChunk((audio) => {
-          if (streamIdRef.current) {
+        case 'START_VIDEO_STREAM': {
+          const granted = await requestCameraPermission();
+          if (!granted) {
             sendMessage({
-              type: 'AUDIO_CHUNK',
-              streamId: streamIdRef.current,
-              audio,
+              type: 'STREAM_ERROR',
+              streamId: msg.streamId,
+              message: 'Camera permission denied',
             });
+            return;
           }
-        });
+          videoIdRef.current = msg.streamId;
+          videoUnsubRef.current = onVideoFrame((frame) => {
+            if (videoIdRef.current) {
+              sendMessage({ type: 'VIDEO_FRAME', streamId: videoIdRef.current, frame });
+            }
+          });
+          await startCamera();
+          notify();
+          break;
+        }
 
-        await startMicCapture();
-        onActiveChange?.(true);
-      } else if (msg.type === 'STOP_STREAM') {
-        await stop();
+        case 'STOP_STREAM': {
+          if (msg.streamId === audioIdRef.current) await stopAudio();
+          if (msg.streamId === videoIdRef.current) await stopVideo();
+          break;
+        }
       }
     });
 
     return () => {
       unsub();
-      stop();
+      stopAudio();
+      stopVideo();
     };
   }, [subscribe, sendMessage, onActiveChange]);
 }

@@ -30,7 +30,7 @@ const CaregiverScreen = () => {
         <Text style={styles.statusEmoji}>{streaming ? '🔴' : '🟢'}</Text>
         <Text style={styles.statusText}>
           {streaming
-            ? 'Microphone is LIVE — a parent is listening'
+            ? 'LIVE — a parent is connected (mic / camera)'
             : isConnected
             ? 'Ready · standing by'
             : 'Connecting…'}
@@ -38,8 +38,8 @@ const CaregiverScreen = () => {
       </View>
 
       <Text style={styles.note}>
-        This device shares its microphone when a parent listens. A notification
-        stays visible while the mic is active.
+        This device shares its microphone (and camera, if requested) when a
+        parent connects. A notification stays visible while the mic is active.
       </Text>
 
       <TouchableOpacity style={styles.logout} onPress={() => auth.signOut()}>
