@@ -120,9 +120,19 @@ const HomeScreen = ({ navigation }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>BabyPhone</Text>
+      <View style={styles.headerRow}>
+        <Text style={styles.header}>BabyPhone</Text>
+        {/* Connection state: grey dot when running/connected, no colour
+            (hollow) when disconnected. */}
+        <View
+          style={[
+            styles.connDot,
+            isConnected ? styles.connDotOn : styles.connDotOff,
+          ]}
+        />
+      </View>
       <Text style={styles.subheader}>
-        {isConnected ? 'Listen to your caregivers' : 'Connecting…'}
+        {isConnected ? 'Listen to your caregivers' : 'Disconnected'}
       </Text>
 
       {contacts.length === 0 ? (
@@ -151,11 +161,32 @@ const HomeScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 60 },
   centerContent: { justifyContent: 'center', alignItems: 'center' },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    paddingHorizontal: 20,
     marginBottom: 5,
+  },
+  connDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: 10,
+  },
+  // Running / connected → grey fill.
+  connDotOn: {
+    backgroundColor: '#9e9e9e',
+    borderWidth: 0,
+  },
+  // Disconnected → no colour (hollow outline only).
+  connDotOff: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#cccccc',
   },
   subheader: {
     fontSize: 14,
