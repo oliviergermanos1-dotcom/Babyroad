@@ -97,13 +97,25 @@ foreground service, and streams `AUDIO_CHUNK`s back to the parent. `STOP_STREAM`
 Android requires the visible notification while the mic is active — it is part
 of the privacy/consent contract and is intentionally kept.
 
-### Still to wire (parent playback)
+### Parent playback (implemented)
 
-The parent currently receives `AUDIO_CHUNK`s and shows the listening visualiser.
-Decoding/playing the raw 16 kHz PCM stream needs a small native player
-(e.g. `AudioTrack` on Android, or a library like `react-native-live-audio-stream`
-/ a WebRTC audio track). See the WebRTC upgrade path below for the recommended
-production route.
+```
+AudioPlayerModule.kt      AudioTrack (16 kHz / mono / PCM-16) in MODE_STREAM,
+                          fed from a dedicated writer thread (no bridge stall)
+services/audioPlayer.ts   start() / playChunk(base64) / stop()
+screens/StreamScreen      starts the player while listening and feeds every
+                          AUDIO_CHUNK; the visualiser shows "Listening…"
+```
+
+`AudioPlayerModule` is registered by the same `MicPackage`, so the single
+`MainApplication` edit above covers both capture and playback.
+
+Tuning notes:
+- The capture side records 16 kHz mono PCM; the player must match that sample
+  rate (it does). If you change one, change the other.
+- Raw PCM over WebSocket is uncompressed (~32 KB/s). For cellular/2G, add Opus
+  encoding on the caregiver and decoding before `playChunk`, or move to WebRTC
+  (below), which handles codecs, jitter buffering and NAT traversal for you.
 
 ## 5. Real-time quality (upgrade path)
 

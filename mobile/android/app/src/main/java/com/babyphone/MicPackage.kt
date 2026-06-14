@@ -6,7 +6,8 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
 /**
- * Registers [MicModule]. Add this to your MainApplication's getPackages():
+ * Registers [MicModule] (caregiver capture) and [AudioPlayerModule] (parent
+ * playback). Add this to your MainApplication's getPackages():
  *
  *   override fun getPackages(): List<ReactPackage> =
  *       PackageList(this).packages.apply { add(MicPackage()) }
@@ -14,7 +15,11 @@ import com.facebook.react.uimanager.ViewManager
 class MicPackage : ReactPackage {
     override fun createNativeModules(
         reactContext: ReactApplicationContext
-    ): List<NativeModule> = listOf(MicModule(reactContext))
+    ): List<NativeModule> =
+        listOf(
+            MicModule(reactContext),
+            AudioPlayerModule(reactContext)
+        )
 
     override fun createViewManagers(
         reactContext: ReactApplicationContext

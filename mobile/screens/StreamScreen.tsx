@@ -9,6 +9,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useWebSocket } from '../services/websocket';
+import { startPlayback, playChunk, stopPlayback } from '../services/audioPlayer';
 import AudioPlayer from '../components/AudioPlayer';
 import StreamViewer from '../components/StreamViewer';
 import type { RootStackParamList } from '../App';
@@ -22,6 +23,7 @@ const StreamScreen = ({ route, navigation }: Props) => {
   const [mode, setMode] = useState<'audio' | 'video'>(streamType);
   const [streamId, setStreamId] = useState<string | null>(null);
   const [frame, setFrame] = useState<string | null>(null);
+  const [audioActive, setAudioActive] = useState(false);
   const [elapsed, setElapsed] = useState(0);
 
   // Timer.
@@ -30,11 +32,24 @@ const StreamScreen = ({ route, navigation }: Props) => {
     return () => clearInterval(t);
   }, []);
 
-  // Listen for stream id + incoming frames.
+  // Open the native player while listening; release it on leave / mode switch.
+  useEffect(() => {
+    if (mode !== 'audio') return;
+    startPlayback();
+    return () => {
+      stopPlayback();
+      setAudioActive(false);
+    };
+  }, [mode]);
+
+  // Listen for stream id, incoming audio chunks and video frames.
   useEffect(() => {
     const unsub = subscribe((msg) => {
       if (msg.type === 'STREAM_STARTED') {
         setStreamId(msg.streamId);
+      } else if (msg.type === 'AUDIO_CHUNK') {
+        playChunk(msg.audio);
+        setAudioActive(true);
       } else if (msg.type === 'VIDEO_FRAME') {
         setFrame(msg.frame);
       } else if (msg.type === 'STOP_STREAM') {
@@ -69,7 +84,7 @@ const StreamScreen = ({ route, navigation }: Props) => {
 
       <View style={styles.body}>
         {mode === 'audio' ? (
-          <AudioPlayer active />
+          <AudioPlayer active={audioActive} />
         ) : (
           <StreamViewer frame={frame} />
         )}

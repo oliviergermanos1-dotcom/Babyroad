@@ -49,7 +49,7 @@ const AudioPlayer = ({ active = true }: AudioPlayerProps) => {
         <Text style={styles.icon}>🔊</Text>
       </Animated.View>
       <Text style={styles.label}>
-        {active ? 'Listening…' : 'Paused'} · {seconds}s
+        {active ? 'Listening…' : 'Connecting…'} · {seconds}s
       </Text>
     </View>
   );
