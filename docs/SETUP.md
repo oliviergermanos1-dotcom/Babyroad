@@ -150,10 +150,56 @@ NAT-traversing media, migrate the media path to **WebRTC**
 
 ## 6. Deploy
 
-- **Backend**: Railway / Render. Set the `FIREBASE_*` env vars, expose the port.
-  Use the `wss://` URL in the app (`EXPO_PUBLIC_WS_URL`).
-- **Mobile**: `cd android && ./gradlew bundleRelease` → upload the AAB to Google
-  Play Console.
+### Backend on Railway (recommended)
+
+Files included: `backend/Dockerfile`, `backend/railway.json`,
+`backend/.dockerignore`, `backend/Procfile`.
+
+1. Push this repo to GitHub (already done if you're reading this on a branch).
+2. https://railway.app → **New Project → Deploy from GitHub repo** → pick this
+   repo.
+3. **Service settings → Root Directory** = `backend`. Railway then picks up
+   `backend/railway.json` and builds with the Dockerfile.
+4. **Variables** — add the Firebase service-account values (do NOT commit them):
+   ```
+   FIREBASE_PROJECT_ID   = your-project-id
+   FIREBASE_CLIENT_EMAIL = firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
+   FIREBASE_PRIVATE_KEY  = -----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n
+   ```
+   Keep the literal `\n` escapes in the private key — the server converts them.
+   `PORT` is injected by Railway automatically; the server reads it.
+5. **Networking → Generate Domain**. You get e.g.
+   `https://babyphone-production.up.railway.app`.
+6. Verify: open `https://<your-domain>/health` → `{"status":"ok",...}`.
+   The same host serves WebSocket over **`wss://`** (TLS is terminated at the
+   Railway edge — no extra config).
+
+> Render works the same way: New Web Service → root `backend` → it reads the
+> `Dockerfile`/`Procfile`; add the same env vars; health check path `/health`.
+
+### Point the app at the deployed server
+
+Set the WebSocket URL to your domain with the **`wss://`** scheme (not `https`):
+
+```
+# .env for the mobile app (or edit mobile/services/config.ts)
+EXPO_PUBLIC_WS_URL=wss://babyphone-production.up.railway.app
+```
+
+Now two phones on different networks (4G + Wi-Fi) can connect. Quick sanity
+check from any machine:
+
+```bash
+npx wscat -c wss://<your-domain>      # connect, then send:
+{"type":"GET_CONTACTS"}               # -> {"type":"ERROR","message":"Not authenticated"}
+```
+
+That `Not authenticated` reply confirms the WebSocket relay is live.
+
+### Mobile release build
+
+`cd mobile/android && ./gradlew bundleRelease` → upload the AAB to Google Play
+Console.
 
 ## Privacy & consent
 
