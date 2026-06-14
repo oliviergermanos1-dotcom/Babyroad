@@ -3,15 +3,20 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
-import { auth } from './services/firebase';
+import { auth, db } from './services/firebase';
 import AuthScreen from './screens/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import StreamScreen from './screens/StreamScreen';
+import CaregiverScreen from './screens/CaregiverScreen';
+
+type Role = 'parent' | 'caregiver';
 
 export type RootStackParamList = {
   Auth: undefined;
   Home: undefined;
+  Caregiver: undefined;
   Stream: {
     caregiverId: string;
     name: string;
@@ -23,11 +28,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<Role>('parent');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((u) => {
+    const unsubscribe = auth.onAuthStateChanged(async (u) => {
       setUser(u);
+      if (u) {
+        try {
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          setRole(snap.data()?.role === 'caregiver' ? 'caregiver' : 'parent');
+        } catch {
+          setRole('parent');
+        }
+      }
       setLoading(false);
     });
     return unsubscribe;
@@ -45,14 +59,18 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen
-              name="Stream"
-              component={StreamScreen}
-              options={{ presentation: 'modal' }}
-            />
-          </>
+          role === 'caregiver' ? (
+            <Stack.Screen name="Caregiver" component={CaregiverScreen} />
+          ) : (
+            <>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen
+                name="Stream"
+                component={StreamScreen}
+                options={{ presentation: 'modal' }}
+              />
+            </>
+          )
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />
         )}

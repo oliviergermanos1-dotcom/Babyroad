@@ -43,6 +43,8 @@ foreground-service notification is required and must stay visible.
 
 ## Status
 
-Starter scaffold — auth, contact list, online presence, and audio/video stream
-signaling are wired end to end. The native mic→WebSocket bridge and (optional)
-WebRTC media path are stubbed with clear TODOs in `docs/SETUP.md`.
+Auth, contact list, online presence, role-based routing (parent/caregiver),
+and audio/video stream signaling are wired end to end. The **native
+mic→WebSocket bridge is implemented** (Kotlin service + native module + JS
+glue + caregiver screen). Parent-side PCM playback and the optional WebRTC
+media path are documented in `docs/SETUP.md`.

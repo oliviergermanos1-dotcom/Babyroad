@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -37,6 +38,9 @@ const StreamScreen = ({ route, navigation }: Props) => {
       } else if (msg.type === 'VIDEO_FRAME') {
         setFrame(msg.frame);
       } else if (msg.type === 'STOP_STREAM') {
+        navigation.goBack();
+      } else if (msg.type === 'STREAM_ERROR') {
+        Alert.alert('Stream error', msg.message || 'The caregiver is unavailable');
         navigation.goBack();
       }
     });

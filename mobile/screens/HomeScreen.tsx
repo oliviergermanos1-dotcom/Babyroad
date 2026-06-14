@@ -122,14 +122,8 @@ const HomeScreen = ({ navigation }: Props) => {
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>BabyPhone</Text>
-        {/* Connection state: grey dot when running/connected, no colour
-            (hollow) when disconnected. */}
-        <View
-          style={[
-            styles.connDot,
-            isConnected ? styles.connDotOn : styles.connDotOff,
-          ]}
-        />
+        {/* Grey dot while running/connected; nothing at all when disconnected. */}
+        {isConnected && <View style={[styles.connDot, styles.connDotOn]} />}
       </View>
       <Text style={styles.subheader}>
         {isConnected ? 'Listen to your caregivers' : 'Disconnected'}
@@ -177,16 +171,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginLeft: 10,
   },
-  // Running / connected → grey fill.
+  // Running / connected → grey fill. (Disconnected → not rendered at all.)
   connDotOn: {
     backgroundColor: '#9e9e9e',
-    borderWidth: 0,
-  },
-  // Disconnected → no colour (hollow outline only).
-  connDotOff: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: '#cccccc',
   },
   subheader: {
     fontSize: 14,

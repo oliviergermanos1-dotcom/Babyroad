@@ -200,6 +200,21 @@ wss.on('connection', (ws) => {
           break;
         }
 
+        // ============== CAREGIVER: STREAM ERROR ==============
+        case 'STREAM_ERROR': {
+          const stream = streams.get(data.streamId);
+          if (stream) {
+            const parentConn = connections.get(stream.parentId);
+            send(parentConn && parentConn.ws, {
+              type: 'STREAM_ERROR',
+              streamId: data.streamId,
+              message: data.message || 'Stream error',
+            });
+            streams.delete(data.streamId);
+          }
+          break;
+        }
+
         // ============== STOP STREAM ==============
         case 'STOP_STREAM': {
           const stream = streams.get(data.streamId);

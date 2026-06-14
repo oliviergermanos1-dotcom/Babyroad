@@ -11,6 +11,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.IBinder
+import android.util.Base64
 import androidx.core.app.NotificationCompat
 
 /**
@@ -86,9 +87,10 @@ class BackgroundMicService : Service() {
     }
 
     private fun sendAudioChunk(audioData: ByteArray) {
-        // TODO: emit to React Native (e.g. DeviceEventManagerModule
-        // .RCTDeviceEventEmitter -> "AudioChunk" with Base64.encodeToString(...))
-        // so the JS WebSocket layer can forward it as an AUDIO_CHUNK message.
+        // Base64-encode the raw PCM and hand it to JS, which forwards it over
+        // the WebSocket as an AUDIO_CHUNK message.
+        val base64 = Base64.encodeToString(audioData, Base64.NO_WRAP)
+        MicModule.emitAudioChunk(base64)
     }
 
     private fun createNotificationChannel() {
