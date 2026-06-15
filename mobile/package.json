@@ -9,9 +9,11 @@
     "tsc": "tsc --noEmit"
   },
   "dependencies": {
+    "@react-native-firebase/app": "^20.3.0",
+    "@react-native-firebase/auth": "^20.3.0",
+    "@react-native-firebase/database": "^20.3.0",
     "@react-navigation/native": "^6.1.0",
     "@react-navigation/native-stack": "^6.9.0",
-    "firebase": "^10.3.0",
     "react": "^18.2.0",
     "react-native": "^0.72.0",
     "react-native-gesture-handler": "^2.13.0",

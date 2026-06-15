@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { User } from 'firebase/auth';
-import { ref, get } from 'firebase/database';
+import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
-import { auth, db } from './services/firebase';
+import { auth, database } from './services/firebase';
 import AuthScreen from './screens/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import StreamScreen from './screens/StreamScreen';
@@ -27,16 +26,16 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [role, setRole] = useState<Role>('parent');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (u) => {
+    const unsubscribe = auth().onAuthStateChanged(async (u) => {
       setUser(u);
       if (u) {
         try {
-          const snap = await get(ref(db, `users/${u.uid}`));
+          const snap = await database().ref(`users/${u.uid}`).once('value');
           setRole(snap.val()?.role === 'caregiver' ? 'caregiver' : 'parent');
         } catch {
           setRole('parent');

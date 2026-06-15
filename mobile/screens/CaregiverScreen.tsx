@@ -42,7 +42,7 @@ const CaregiverScreen = () => {
         parent connects. A notification stays visible while the mic is active.
       </Text>
 
-      <TouchableOpacity style={styles.logout} onPress={() => auth.signOut()}>
+      <TouchableOpacity style={styles.logout} onPress={() => auth().signOut()}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>

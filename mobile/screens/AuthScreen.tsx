@@ -8,19 +8,15 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import {
-  signInWithPhoneNumber,
-  type ConfirmationResult,
-} from 'firebase/auth';
+import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { auth } from '../services/firebase';
 
 const AuthScreen = () => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(
-    null
-  );
+  const [confirmation, setConfirmation] =
+    useState<FirebaseAuthTypes.ConfirmationResult | null>(null);
 
   const handlePhoneSubmit = async () => {
     if (!phone.trim()) {
@@ -29,9 +25,10 @@ const AuthScreen = () => {
     }
     setLoading(true);
     try {
-      // NOTE: phone auth in React Native requires the native Firebase SDK
-      // (@react-native-firebase/auth) or a reCAPTCHA verifier. See docs/SETUP.md.
-      const result = await signInWithPhoneNumber(auth, phone);
+      // @react-native-firebase handles SMS / test numbers natively — no
+      // reCAPTCHA needed. Test numbers configured in the Firebase console
+      // (e.g. +2250700000000 / 123456) skip the real SMS.
+      const result = await auth().signInWithPhoneNumber(phone);
       setConfirmation(result);
       Alert.alert('OTP sent', 'Check your SMS for the verification code');
     } catch (error: any) {

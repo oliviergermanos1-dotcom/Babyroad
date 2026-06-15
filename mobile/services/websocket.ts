@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { auth } from './firebase';
 import { WS_URL } from './config';
 
+// auth is the @react-native-firebase/auth module function: call auth() to use it.
+
 export interface WebSocketMessage {
   type: string;
   [key: string]: any;
@@ -25,7 +27,7 @@ export const useWebSocket = (role: 'parent' | 'caregiver' = 'parent') => {
   const closedByUs = useRef(false);
 
   const connect = useCallback(async () => {
-    const user = auth.currentUser;
+    const user = auth().currentUser;
     if (!user) return;
 
     const ws = new WebSocket(WS_URL);

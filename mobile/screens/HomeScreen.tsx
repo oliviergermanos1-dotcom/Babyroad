@@ -9,9 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { ref, query, orderByChild, equalTo, get } from 'firebase/database';
 
-import { auth, db } from '../services/firebase';
+import { auth, database } from '../services/firebase';
 import { useWebSocket } from '../services/websocket';
 import type { RootStackParamList } from '../App';
 
@@ -32,12 +31,11 @@ const HomeScreen = ({ navigation }: Props) => {
   const loadContacts = useCallback(async () => {
     try {
       setLoading(true);
-      const q = query(
-        ref(db, 'users'),
-        orderByChild('role'),
-        equalTo('caregiver')
-      );
-      const snapshot = await get(q);
+      const snapshot = await database()
+        .ref('users')
+        .orderByChild('role')
+        .equalTo('caregiver')
+        .once('value');
       const list: Contact[] = [];
       snapshot.forEach((child) => {
         const v = child.val();
@@ -47,6 +45,7 @@ const HomeScreen = ({ navigation }: Props) => {
           phone: v.phone,
           isOnline: false,
         });
+        return false; // keep iterating
       });
       setContacts(list);
     } catch (e) {
@@ -81,7 +80,7 @@ const HomeScreen = ({ navigation }: Props) => {
   }, [isConnected, sendMessage]);
 
   const handleStartAudio = (caregiverId: string, name: string) => {
-    if (!auth.currentUser) return;
+    if (!auth().currentUser) return;
     sendMessage({ type: 'START_AUDIO_STREAM', caregiverId });
     navigation.navigate('Stream', { caregiverId, name, streamType: 'audio' });
   };
@@ -148,7 +147,7 @@ const HomeScreen = ({ navigation }: Props) => {
 
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => auth.signOut()}
+        onPress={() => auth().signOut()}
       >
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
