@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 import { auth, database } from './services/firebase';
+import { WebSocketProvider } from './services/ws';
 import { colors } from './theme';
 import AuthScreen from './screens/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -62,11 +63,22 @@ export default function App() {
     );
   }
 
+  if (!user) {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Auth" component={AuthScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+  }
+
+  // One shared WebSocket connection for the whole authenticated app.
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
-          role === 'caregiver' ? (
+    <WebSocketProvider role={role}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {role === 'caregiver' ? (
             <Stack.Screen name="Caregiver" component={CaregiverScreen} />
           ) : (
             <>
@@ -77,11 +89,9 @@ export default function App() {
                 options={{ presentation: 'modal' }}
               />
             </>
-          )
-        ) : (
-          <Stack.Screen name="Auth" component={AuthScreen} />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </WebSocketProvider>
   );
 }

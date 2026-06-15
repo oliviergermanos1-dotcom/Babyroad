@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 import { auth } from '../services/firebase';
-import { useWebSocket } from '../services/websocket';
+import { useWS } from '../services/ws';
 import { useCaregiverStream } from '../services/useCaregiverStream';
 import { colors, radius, shadow } from '../theme';
 
@@ -12,7 +12,7 @@ import { colors, radius, shadow } from '../theme';
  * keeps the device user aware the mic is active.
  */
 const CaregiverScreen = () => {
-  const { isConnected, sendMessage, subscribe } = useWebSocket('caregiver');
+  const { isConnected, sendMessage, subscribe } = useWS();
   const [streaming, setStreaming] = useState(false);
 
   useCaregiverStream({ subscribe, sendMessage, onActiveChange: setStreaming });

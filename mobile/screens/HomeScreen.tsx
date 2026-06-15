@@ -12,7 +12,7 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { auth, database } from '../services/firebase';
-import { useWebSocket } from '../services/websocket';
+import { useWS } from '../services/ws';
 import { colors, radius, shadow } from '../theme';
 import type { RootStackParamList } from '../App';
 
@@ -28,7 +28,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 const HomeScreen = ({ navigation }: Props) => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isConnected, sendMessage, subscribe } = useWebSocket('parent');
+  const { isConnected, sendMessage, subscribe } = useWS();
 
   const loadContacts = useCallback(async () => {
     try {

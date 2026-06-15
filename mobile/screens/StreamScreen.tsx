@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { useWebSocket } from '../services/websocket';
+import { useWS } from '../services/ws';
 import { startPlayback, playChunk, stopPlayback } from '../services/audioPlayer';
 import AudioPlayer from '../components/AudioPlayer';
 import StreamViewer from '../components/StreamViewer';
@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Stream'>;
 
 const StreamScreen = ({ route, navigation }: Props) => {
   const { caregiverId, name, streamType } = route.params;
-  const { sendMessage, subscribe } = useWebSocket('parent');
+  const { sendMessage, subscribe } = useWS();
 
   const [mode, setMode] = useState<'audio' | 'video'>(streamType);
   const [streamId, setStreamId] = useState<string | null>(null);
@@ -55,8 +55,13 @@ const StreamScreen = ({ route, navigation }: Props) => {
         setFrame(msg.frame);
       } else if (msg.type === 'STOP_STREAM') {
         navigation.goBack();
-      } else if (msg.type === 'STREAM_ERROR') {
-        Alert.alert('Stream error', msg.message || 'The caregiver is unavailable');
+      } else if (msg.type === 'STREAM_ERROR' || msg.type === 'ERROR') {
+        Alert.alert(
+          'Écoute impossible',
+          msg.message === 'Caregiver not available'
+            ? "L'appareil bébé n'est pas connecté."
+            : msg.message || 'Réessaie dans un instant.'
+        );
         navigation.goBack();
       }
     });
