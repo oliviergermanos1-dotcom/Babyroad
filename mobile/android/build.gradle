@@ -2,10 +2,10 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "33.0.0"
+        buildToolsVersion = "34.0.0"
         minSdkVersion = 21
-        compileSdkVersion = 33
-        targetSdkVersion = 33
+        compileSdkVersion = 34
+        targetSdkVersion = 34
 
         // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
@@ -21,5 +21,17 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         // Firebase (@react-native-firebase) — reads android/app/google-services.json
         classpath("com.google.gms:google-services:4.4.2")
+    }
+}
+
+// Pin androidx.core down: newer transitive versions (1.15+/1.16) demand
+// compileSdk 35 + AGP 8.6, which RN 0.72's AGP 7.4 can't satisfy. 1.13.1 works
+// with compileSdk 34 and AGP 7.4.
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force "androidx.core:core:1.13.1"
+            force "androidx.core:core-ktx:1.13.1"
+        }
     }
 }
