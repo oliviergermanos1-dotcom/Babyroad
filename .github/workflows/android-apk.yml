@@ -1,0 +1,56 @@
+name: Build Android APK
+
+# Builds a debug APK you can download and install on any Android phone
+# (no local dev environment needed). Run it from the Actions tab
+# ("Run workflow"), then grab the artifact "babyphone-debug-apk".
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/babyphone-dev-start-a4rsn9]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Provide google-services.json
+        run: |
+          if [ ! -f android/app/google-services.json ] && [ -n "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
+            echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > android/app/google-services.json
+          fi
+          if [ ! -f android/app/google-services.json ]; then
+            echo "::error::android/app/google-services.json is missing. Commit it to the repo (mobile/android/app/) or set the GOOGLE_SERVICES_JSON secret (base64)."
+            exit 1
+          fi
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: mobile/android
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: babyphone-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
