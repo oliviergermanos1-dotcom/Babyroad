@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { ref, query, orderByChild, equalTo, get } from 'firebase/database';
 
 import { auth, db } from '../services/firebase';
 import { useWebSocket } from '../services/websocket';
@@ -33,18 +33,22 @@ const HomeScreen = ({ navigation }: Props) => {
     try {
       setLoading(true);
       const q = query(
-        collection(db, 'users'),
-        where('role', '==', 'caregiver')
+        ref(db, 'users'),
+        orderByChild('role'),
+        equalTo('caregiver')
       );
-      const snapshot = await getDocs(q);
-      setContacts(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          name: doc.data().name,
-          phone: doc.data().phone,
+      const snapshot = await get(q);
+      const list: Contact[] = [];
+      snapshot.forEach((child) => {
+        const v = child.val();
+        list.push({
+          id: child.key as string,
+          name: v.name,
+          phone: v.phone,
           isOnline: false,
-        }))
-      );
+        });
+      });
+      setContacts(list);
     } catch (e) {
       Alert.alert('Error', 'Failed to load contacts');
     } finally {

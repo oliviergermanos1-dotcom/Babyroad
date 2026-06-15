@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { ref, get } from 'firebase/database';
 
 import { auth, db } from './services/firebase';
 import AuthScreen from './screens/AuthScreen';
@@ -36,8 +36,8 @@ export default function App() {
       setUser(u);
       if (u) {
         try {
-          const snap = await getDoc(doc(db, 'users', u.uid));
-          setRole(snap.data()?.role === 'caregiver' ? 'caregiver' : 'parent');
+          const snap = await get(ref(db, `users/${u.uid}`));
+          setRole(snap.val()?.role === 'caregiver' ? 'caregiver' : 'parent');
         } catch {
           setRole('parent');
         }

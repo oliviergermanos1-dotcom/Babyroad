@@ -41,7 +41,11 @@ function buildCredential() {
   }
 }
 
-admin.initializeApp({ credential: buildCredential() });
+admin.initializeApp({
+  credential: buildCredential(),
+  // Realtime Database URL (same value as the mobile app's databaseURL).
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
 
 const app = express();
 const server = http.createServer(app);
@@ -234,17 +238,22 @@ wss.on('connection', (ws) => {
         case 'GET_CONTACTS': {
           if (role !== 'parent') break;
 
-          const db = admin.firestore();
-          const userDoc = await db.collection('users').doc(userId).get();
-          const contactIds = userDoc.data()?.contacts || [];
+          const db = admin.database();
+          const userSnap = await db.ref(`users/${userId}`).once('value');
+          const rawContacts = userSnap.val()?.contacts || [];
+          // contacts may be an array or a { uid: true } map (RTDB-idiomatic).
+          const contactIds = Array.isArray(rawContacts)
+            ? rawContacts
+            : Object.keys(rawContacts);
 
           const contacts = await Promise.all(
             contactIds.map(async (contactId) => {
-              const doc = await db.collection('users').doc(contactId).get();
+              const snap = await db.ref(`users/${contactId}`).once('value');
+              const v = snap.val() || {};
               return {
                 id: contactId,
-                name: doc.data()?.name || 'Unknown',
-                phone: doc.data()?.phone || '',
+                name: v.name || 'Unknown',
+                phone: v.phone || '',
                 isOnline: connections.has(contactId),
               };
             })

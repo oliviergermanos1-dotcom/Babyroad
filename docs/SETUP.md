@@ -20,15 +20,27 @@ caregiver phone  ──mic/cam──►  WebSocket server  ──relay──► 
 
 1. Create a project at https://console.firebase.google.com
 2. **Auth** → enable *Phone* sign-in.
-3. **Firestore** → create a `users` collection. Each user document:
+3. **Realtime Database** (not Firestore — Firestore now requires billing on new
+   projects; Realtime DB is free on the Spark plan). Create it, pick a region
+   (e.g. europe-west1), start in locked mode. Data shape under `users/<uid>`:
    ```json
    {
-     "name": "Grace",
-     "phone": "+22500000000",
-     "role": "parent",          // or "caregiver"
-     "contacts": ["<caregiverUid>", "..."]   // parents only
+     "users": {
+       "<uid>": {
+         "name": "Grace",
+         "phone": "+2250748968636",
+         "role": "parent",                      // or "caregiver"
+         "contacts": { "<caregiverUid>": true } // parents only
+       }
+     }
    }
    ```
+   Copy the database URL shown at the top of the page into BOTH
+   `mobile/services/firebase.ts` (`databaseURL`) and the backend env var
+   `FIREBASE_DATABASE_URL`. Publish the security rules from
+   `firebase/database.rules.json` (Realtime Database → Rules tab):
+   authenticated users can read the user list (contact discovery) and write
+   only their own profile; the backend uses the Admin SDK and bypasses rules.
 4. **Service account** (backend): Project settings → Service accounts →
    *Generate new private key*. Save it as `backend/firebase-admin.json`
    (gitignored) **or** copy the values into `backend/.env`
