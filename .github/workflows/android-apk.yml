@@ -1,8 +1,8 @@
 name: Build Android APK
 
-# Builds a debug APK you can download and install on any Android phone
-# (no local dev environment needed). Run it from the Actions tab
-# ("Run workflow"), then grab the artifact "babyphone-debug-apk".
+# Builds the release APK, uploads it as an artifact, and (when the
+# FIREBASE_SERVICE_ACCOUNT secret is set) auto-distributes it to testers via
+# Firebase App Distribution for one-tap updates.
 
 on:
   workflow_dispatch:
