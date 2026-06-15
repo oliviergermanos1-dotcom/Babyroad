@@ -7,11 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Image,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { auth, database } from '../services/firebase';
 import { useWebSocket } from '../services/websocket';
+import { colors, radius, shadow } from '../theme';
 import type { RootStackParamList } from '../App';
 
 interface Contact {
@@ -45,11 +47,11 @@ const HomeScreen = ({ navigation }: Props) => {
           phone: v.phone,
           isOnline: false,
         });
-        return false; // keep iterating
+        return false;
       });
       setContacts(list);
     } catch (e) {
-      Alert.alert('Error', 'Failed to load contacts');
+      Alert.alert('Erreur', 'Impossible de charger les contacts');
     } finally {
       setLoading(false);
     }
@@ -59,7 +61,6 @@ const HomeScreen = ({ navigation }: Props) => {
     loadContacts();
   }, [loadContacts]);
 
-  // Keep online dots in sync with server USER_STATUS broadcasts.
   useEffect(() => {
     const unsub = subscribe((msg) => {
       if (msg.type === 'USER_STATUS') {
@@ -87,142 +88,173 @@ const HomeScreen = ({ navigation }: Props) => {
 
   const renderContact = ({ item }: { item: Contact }) => (
     <View style={styles.contactCard}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>
+          {(item.name || '?').charAt(0).toUpperCase()}
+        </Text>
+        {item.isOnline && <View style={styles.onlineDot} />}
+      </View>
       <View style={styles.contactInfo}>
         <Text style={styles.contactName}>{item.name}</Text>
         <Text style={styles.contactPhone}>{item.phone}</Text>
-        <View style={styles.statusBadge}>
-          <View
-            style={[
-              styles.statusDot,
-              { backgroundColor: item.isOnline ? '#4CAF50' : '#999' },
-            ]}
-          />
-          <Text style={styles.statusText}>
-            {item.isOnline ? 'Online' : 'Offline'}
-          </Text>
-        </View>
+        <Text
+          style={[
+            styles.statusText,
+            { color: item.isOnline ? colors.green : colors.muted },
+          ]}
+        >
+          {item.isOnline ? '● En ligne' : '○ Hors ligne'}
+        </Text>
       </View>
-
       <TouchableOpacity
         style={[styles.listenButton, !item.isOnline && styles.buttonDisabled]}
         onPress={() => handleStartAudio(item.id, item.name)}
         disabled={!item.isOnline}
+        activeOpacity={0.85}
       >
-        <Text style={styles.buttonText}>Listen</Text>
+        <Text style={styles.listenText}>Écouter</Text>
       </TouchableOpacity>
     </View>
   );
 
   if (loading) {
     return (
-      <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color={colors.green} />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerRow}>
-        <Text style={styles.header}>BabyPhone</Text>
-        {/* Grey dot while running/connected; nothing at all when disconnected. */}
-        {isConnected && <View style={[styles.connDot, styles.connDotOn]} />}
+      <View style={styles.header}>
+        <Image
+          source={require('../assets/logo_clean.png')}
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerTitle}>BabyPhone CIV</Text>
+          <Text style={styles.headerSub}>
+            {isConnected ? 'Connecté' : 'Connexion…'}
+          </Text>
+        </View>
+        {isConnected && <View style={styles.connDot} />}
       </View>
-      <Text style={styles.subheader}>
-        {isConnected ? 'Listen to your caregivers' : 'Disconnected'}
-      </Text>
+
+      <Text style={styles.sectionTitle}>Mes appareils bébé</Text>
 
       {contacts.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>No caregivers added yet</Text>
+        <View style={styles.empty}>
+          <Text style={styles.emptyEmoji}>👶</Text>
+          <Text style={styles.emptyText}>Aucun appareil ajouté</Text>
+          <Text style={styles.emptyHint}>
+            Les appareils « bébé » apparaîtront ici une fois ajoutés.
+          </Text>
         </View>
       ) : (
         <FlatList
           data={contacts}
           renderItem={renderContact}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={styles.list}
         />
       )}
 
       <TouchableOpacity
-        style={styles.logoutButton}
+        style={styles.logout}
         onPress={() => auth().signOut()}
+        activeOpacity={0.85}
       >
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text style={styles.logoutText}>Déconnexion</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5', paddingTop: 60 },
-  centerContent: { justifyContent: 'center', alignItems: 'center' },
-  headerRow: {
+  container: { flex: 1, backgroundColor: colors.bg, paddingTop: 50 },
+  center: { justifyContent: 'center', alignItems: 'center' },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingBottom: 16,
+    gap: 12,
   },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  connDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginLeft: 10,
-  },
-  // Running / connected → grey fill. (Disconnected → not rendered at all.)
-  connDotOn: {
-    backgroundColor: '#9e9e9e',
-  },
-  subheader: {
+  headerLogo: { width: 46, height: 46 },
+  headerTitle: { fontSize: 22, fontWeight: '800', color: colors.greenDark },
+  headerSub: { fontSize: 13, color: colors.muted, marginTop: 2 },
+  connDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.green },
+  sectionTitle: {
     fontSize: 14,
-    color: '#666',
+    fontWeight: '700',
+    color: colors.muted,
     paddingHorizontal: 20,
-    marginBottom: 20,
+    marginBottom: 10,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  listContent: { paddingHorizontal: 20, paddingBottom: 20 },
+  list: { paddingHorizontal: 16, paddingBottom: 20 },
   contactCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    padding: 14,
     marginBottom: 12,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    gap: 14,
+    ...shadow,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.greenLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { fontSize: 20, fontWeight: '800', color: colors.green },
+  onlineDot: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.green,
+    borderWidth: 2,
+    borderColor: colors.card,
   },
   contactInfo: { flex: 1 },
-  contactName: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  contactPhone: { fontSize: 14, color: '#999', marginBottom: 8 },
-  statusBadge: { flexDirection: 'row', alignItems: 'center' },
-  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
-  statusText: { fontSize: 12, color: '#666' },
+  contactName: { fontSize: 16, fontWeight: '700', color: colors.text },
+  contactPhone: { fontSize: 13, color: colors.muted, marginVertical: 2 },
+  statusText: { fontSize: 12, fontWeight: '600' },
   listenButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+    backgroundColor: colors.orange,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: radius.pill,
   },
-  buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { fontSize: 16, color: '#999' },
-  logoutButton: {
+  buttonDisabled: { opacity: 0.4 },
+  listenText: { color: colors.white, fontWeight: '700', fontSize: 14 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
+  emptyEmoji: { fontSize: 54, marginBottom: 12 },
+  emptyText: { fontSize: 17, fontWeight: '700', color: colors.text },
+  emptyHint: {
+    fontSize: 14,
+    color: colors.muted,
+    textAlign: 'center',
+    marginTop: 6,
+  },
+  logout: {
     margin: 20,
-    paddingVertical: 12,
-    backgroundColor: '#FF3B30',
-    borderRadius: 8,
+    paddingVertical: 14,
+    backgroundColor: colors.greenLight,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
-  logoutText: { color: '#fff', fontWeight: '600' },
+  logoutText: { color: colors.greenDark, fontWeight: '700' },
 });
 
 export default HomeScreen;

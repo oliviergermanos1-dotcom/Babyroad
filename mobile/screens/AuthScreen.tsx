@@ -7,12 +7,16 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { auth } from '../services/firebase';
+import { colors, radius, shadow } from '../theme';
 
 const AuthScreen = () => {
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState('+225');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmation, setConfirmation] =
@@ -20,19 +24,15 @@ const AuthScreen = () => {
 
   const handlePhoneSubmit = async () => {
     if (!phone.trim()) {
-      Alert.alert('Error', 'Please enter a phone number');
+      Alert.alert('Erreur', 'Entre ton numéro de téléphone');
       return;
     }
     setLoading(true);
     try {
-      // @react-native-firebase handles SMS / test numbers natively — no
-      // reCAPTCHA needed. Test numbers configured in the Firebase console
-      // (e.g. +2250700000000 / 123456) skip the real SMS.
-      const result = await auth().signInWithPhoneNumber(phone);
+      const result = await auth().signInWithPhoneNumber(phone.replace(/\s/g, ''));
       setConfirmation(result);
-      Alert.alert('OTP sent', 'Check your SMS for the verification code');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Erreur', error.message);
     } finally {
       setLoading(false);
     }
@@ -40,103 +40,173 @@ const AuthScreen = () => {
 
   const handleOtpSubmit = async () => {
     if (!otp.trim() || !confirmation) {
-      Alert.alert('Error', 'Please enter the OTP');
+      Alert.alert('Erreur', 'Entre le code reçu');
       return;
     }
     setLoading(true);
     try {
       await confirmation.confirm(otp);
-      // onAuthStateChanged in App.tsx handles the redirect.
     } catch (error: any) {
-      Alert.alert('Error', 'Invalid OTP');
+      Alert.alert('Erreur', 'Code incorrect');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>BabyPhone</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.hero}>
+        <Image
+          source={require('../assets/logo_clean.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>BabyPhone CIV</Text>
+        <Text style={styles.subtitle}>
+          Gardez une oreille sur bébé, où que vous soyez
+        </Text>
+      </View>
 
-      {!confirmation ? (
-        <>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter phone number (+225...)"
-            value={phone}
-            onChangeText={setPhone}
-            editable={!loading}
-            keyboardType="phone-pad"
-            autoComplete="tel"
-          />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handlePhoneSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Send OTP</Text>
-            )}
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter OTP"
-            value={otp}
-            onChangeText={setOtp}
-            editable={!loading}
-            keyboardType="number-pad"
-          />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleOtpSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Verify OTP</Text>
-            )}
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
+      <View style={styles.card}>
+        {!confirmation ? (
+          <>
+            <Text style={styles.label}>Numéro de téléphone</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="+225 07 00 00 00 00"
+              placeholderTextColor={colors.muted}
+              value={phone}
+              onChangeText={setPhone}
+              editable={!loading}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+            />
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handlePhoneSubmit}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.buttonText}>Recevoir le code</Text>
+              )}
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text style={styles.label}>Code reçu par SMS</Text>
+            <TextInput
+              style={[styles.input, styles.otpInput]}
+              placeholder="••••••"
+              placeholderTextColor={colors.muted}
+              value={otp}
+              onChangeText={setOtp}
+              editable={!loading}
+              keyboardType="number-pad"
+              maxLength={6}
+            />
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={handleOtpSubmit}
+              disabled={loading}
+              activeOpacity={0.85}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.white} />
+              ) : (
+                <Text style={styles.buttonText}>Se connecter</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setConfirmation(null);
+                setOtp('');
+              }}
+              disabled={loading}
+            >
+              <Text style={styles.linkText}>← Changer de numéro</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+
+      <Text style={styles.footer}>🇨🇮 Fait en Côte d'Ivoire</Text>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 24,
   },
+  hero: { alignItems: 'center', marginBottom: 28 },
+  logo: { width: 150, height: 150, marginBottom: 8 },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 40,
+    fontSize: 28,
+    fontWeight: '800',
+    color: colors.greenDark,
+    letterSpacing: 0.3,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: colors.muted,
     textAlign: 'center',
+    marginTop: 6,
+    paddingHorizontal: 20,
+  },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    padding: 22,
+    ...shadow,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.greenDark,
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 8,
-    fontSize: 16,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.bg,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: radius.md,
+    fontSize: 17,
+    color: colors.text,
+    marginBottom: 16,
   },
+  otpInput: { letterSpacing: 8, textAlign: 'center', fontSize: 22 },
   button: {
-    backgroundColor: '#007AFF',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: colors.green,
+    paddingVertical: 16,
+    borderRadius: radius.md,
     alignItems: 'center',
+    ...shadow,
   },
   buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  buttonText: { color: colors.white, fontSize: 16, fontWeight: '700' },
+  linkText: {
+    color: colors.orange,
+    textAlign: 'center',
+    marginTop: 16,
+    fontWeight: '600',
+  },
+  footer: {
+    textAlign: 'center',
+    color: colors.muted,
+    marginTop: 28,
+    fontSize: 13,
+  },
 });
 
 export default AuthScreen;

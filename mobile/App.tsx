@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 import { auth, database } from './services/firebase';
+import { colors } from './theme';
 import AuthScreen from './screens/AuthScreen';
 import HomeScreen from './screens/HomeScreen';
 import StreamScreen from './screens/StreamScreen';
@@ -48,8 +49,15 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colors.bg,
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.green} />
       </View>
     );
   }

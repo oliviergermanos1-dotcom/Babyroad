@@ -12,6 +12,7 @@ import { useWebSocket } from '../services/websocket';
 import { startPlayback, playChunk, stopPlayback } from '../services/audioPlayer';
 import AudioPlayer from '../components/AudioPlayer';
 import StreamViewer from '../components/StreamViewer';
+import { colors } from '../theme';
 import type { RootStackParamList } from '../App';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Stream'>;
@@ -123,16 +124,16 @@ const styles = StyleSheet.create({
   },
   videoButton: {
     flex: 1,
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.green,
+    paddingVertical: 14,
+    borderRadius: 999,
     alignItems: 'center',
   },
   stopButton: {
     flex: 1,
-    backgroundColor: '#FF3B30',
-    paddingVertical: 12,
-    borderRadius: 8,
+    backgroundColor: colors.danger,
+    paddingVertical: 14,
+    borderRadius: 999,
     alignItems: 'center',
   },
   controlText: { color: '#fff', fontWeight: '600', fontSize: 14 },
