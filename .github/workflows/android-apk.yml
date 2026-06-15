@@ -45,6 +45,16 @@ jobs:
             exit 1
           fi
 
+      - name: Generate debug keystore
+        working-directory: mobile/android/app
+        run: |
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -v -keystore debug.keystore \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
         working-directory: mobile/android
