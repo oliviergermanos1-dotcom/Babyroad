@@ -1,14 +1,14 @@
 {
   "project_info": {
     "project_number": "1006085209778",
-    "project_id": "babyphone-3489d",
     "firebase_url": "https://babyphone-3489d-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "babyphone-3489d",
     "storage_bucket": "babyphone-3489d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1006085209778:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:1006085209778:android:261bc60272ee41903f53ab",
         "android_client_info": {
           "package_name": "com.babyphone"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCFpMK8dyMHwYKqR-GmICIJiGelBhDSgC8"
+          "current_key": "AIzaSyBADtIJTrOVQSTLqznulKJsMd7Afdfundo"
         }
       ],
       "services": {
